@@ -7,6 +7,6 @@
 - Domain: https://vidsave.karatell.ru; backend origin: https://api.vidsave.karatell.ru.
 - Runtime environment: .env.production.example; настоящие значения — только в Dokploy.
 - GitHub Environment production: secret DOKPLOY_DEPLOY_WEBHOOK (frontend URL, предоставленный владельцем).
-- Repository variable DEPLOY_ENABLED=true включает публикацию/deploy только после успешных проверок default branch. До готовности оставить выключенной.
+- Публикация образа и деплой запускаются автоматически после успешных проверок default branch. DEPLOY_ENABLED не требуется.
 - Dokploy: Docker provider, Auto Deploy включён, private GHCR read:packages credentials, HTTPS, один frontend instance.
 - Workflow .github/workflows/deploy.yml: PR/main/master checks; publish latest+SHA; webhook без раскрытия токена. Деплой сейчас не запускался.
