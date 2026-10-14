@@ -44,15 +44,13 @@
 }
 
 .nav a,
-.credit,
 .legal {
   color: var(--site-muted);
   font-size: 12px;
   line-height: 1.7;
 }
 
-.nav a:hover,
-.credit a:hover {
+.nav a:hover {
   color: var(--site-accent);
 }
 
@@ -76,24 +74,6 @@
   color: var(--site-muted);
   font-size: 12px;
   line-height: 1.7;
-}
-
-.credit {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  white-space: nowrap;
-}
-
-.credit a {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--site-text);
-}
-
-.credit img {
-  object-fit: contain;
 }
 
 @media (max-width: 780px) {

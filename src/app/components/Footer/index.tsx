@@ -1,5 +1,4 @@
 'use client';
-import Image from 'next/image';
 import BrandLogo from '../BrandLogo';
 import Link from 'next/link';
 import { useContactData } from '@/app/components/CmsContent';
@@ -39,13 +38,6 @@ export default function Footer() {
           <Link className={styles.legalEmail} href={'mailto:' + contactData.legalEmail}>
             {contactData.legalEmail}
           </Link>
-          <span className={styles.credit}>
-            Проект создан:{' '}
-            <Link href="https://el-solo.karatell.ru" target="_blank" rel="noreferrer">
-              El Solo
-              <Image src="/images/logo_el_solo.png" alt="Логотип разработчика El Solo" width={24} height={24} />
-            </Link>
-          </span>
         </div>
       </div>
     </footer>
