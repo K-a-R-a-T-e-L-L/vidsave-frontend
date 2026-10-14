@@ -414,9 +414,9 @@ export function CmsEditor({ resource, id }: { resource: Resource; id?: string })
                 <PasswordInput
                   key={field.name}
                   {...common}
-                  minLength={14}
+                  minLength={8}
                   autoComplete="new-password"
-                  description="Не менее 14 символов; сервер также проверяет длину в байтах."
+                  description="Не менее 8 символов; сервер также проверяет длину в байтах."
                   value={value}
                   onChange={(e) => set(field.name, e.currentTarget.value)}
                 />

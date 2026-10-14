@@ -242,7 +242,7 @@ export function validateCreateAdminInput(value: unknown): { email: string; passw
     email.length > 320 ||
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
     password.length > 256 ||
-    [...password].length < 14 ||
+    [...password].length < 8 ||
     Buffer.byteLength(password, 'utf8') > 72
   ) {
     return null;
