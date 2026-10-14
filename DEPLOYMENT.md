@@ -2,8 +2,8 @@
 
 Полная инструкция общего проекта: [backend DEPLOYMENT.md](../vidsave-backend/DEPLOYMENT.md).
 
-- Origin: https://github.com/K-a-R-a-T-e-L-L/kciasso-frontend.git; локальная main и удалённая master имеют разную историю, ничего не объединялось и не отправлялось.
-- Docker image: ghcr.io/k-a-r-a-t-e-l-l/kciasso-frontend:latest, container port3000.
+- Origin: https://github.com/K-a-R-a-T-e-L-L/vidsave-frontend.git; ветка main содержит текущий VidSave; локальная main отслеживает origin/main.
+- Docker image: ghcr.io/k-a-r-a-t-e-l-l/vidsave-frontend:latest, container port3000.
 - Domain: https://vidsave.karatell.ru; backend origin: https://api.vidsave.karatell.ru.
 - Runtime environment: .env.production.example; настоящие значения — только в Dokploy.
 - GitHub Environment production: secret DOKPLOY_DEPLOY_WEBHOOK (frontend URL, предоставленный владельцем).
