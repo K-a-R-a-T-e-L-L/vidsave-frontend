@@ -21,3 +21,4 @@ export const useGetSizingWindow = () => {
 
   return [WidthWindow, HeightWindow] as const;
 };
+//
