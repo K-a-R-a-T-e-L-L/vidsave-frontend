@@ -1,39 +1,41 @@
 'use client';
 
 import Script from 'next/script';
+import { useCms } from '../CmsContent';
 
 export function YMCounter() {
-    return (
-        <>
-            <Script
-                id="yandex-metrika"
-                strategy="lazyOnload"
-                dangerouslySetInnerHTML={{
-                    __html: `
+  const { settings } = useCms();
+  const id = settings.analyticsId;
+  if (!/^\d{1,12}$/.test(id)) return null;
+  return (
+    <>
+      <Script
+        id="yandex-metrika"
+        strategy="lazyOnload"
+        dangerouslySetInnerHTML={{
+          __html: `
             (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
             m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-            (window, document, "script", "https://mc.yandex.ru/metrika/tag.js?id=103870623", "ym");
+            (window, document, "script", "https://mc.yandex.ru/metrika/tag.js?id=${id}", "ym");
 
-            ym(103870623, "init", {
+            ym(${id}, "init", {
               ssr: true,
-              webvisor: true,
+              webvisor: false,
               clickmap: true,
               ecommerce: "dataLayer",
               accurateTrackBounce: true,
               trackLinks: true
             });
           `,
-                }}
-            />
-            <noscript>
-                <div>
-                    <img
-                        src="https://mc.yandex.ru/watch/103870623"
-                        style={{ position: 'absolute', left: '-9999px' }}
-                        alt=""
-                    />
-                </div>
-            </noscript>
-        </>
-    );
+        }}
+      />
+      <noscript>
+        <div>
+          {/* Native img keeps the external Yandex Metrica tracking pixel available without JavaScript. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={`https://mc.yandex.ru/watch/${id}`} style={{ position: 'absolute', left: '-9999px' }} alt="" />
+        </div>
+      </noscript>
+    </>
+  );
 }

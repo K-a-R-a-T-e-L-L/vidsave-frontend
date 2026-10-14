@@ -1,173 +1,173 @@
 .container_slider {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: absolute;
 
-    .slick-slider,
-    .slick-initialized {
-        flex: 1;
+  .slick-slider,
+  .slick-initialized {
+    flex: 1;
 
-        .slick-arrow {
-            width: 10%;
-            height: 40%;
-            padding-bottom: 40px;
-            border-radius: 100px;
-            display: var(--buttons) !important;
-            opacity: 0.7;
-            transition:
-                opacity 0.2s ease-in-out,
-                scale 0.2s ease-in-out;
-            z-index: 0;
+    .slick-arrow {
+      width: 10%;
+      height: 40%;
+      padding-bottom: 40px;
+      border-radius: 100px;
+      display: var(--buttons) !important;
+      opacity: 0.7;
+      transition:
+        opacity 0.2s ease-in-out,
+        scale 0.2s ease-in-out;
+      z-index: 0;
 
-            &:hover {
-                opacity: 1;
-            }
+      &:hover {
+        opacity: 1;
+      }
+
+      &:active {
+        scale: 0.98;
+      }
+    }
+
+    .slick-next {
+      font-family: 'Times New Roman', Times, serif;
+      right: -10%;
+
+      &::before {
+        font-family: 'Times New Roman', Times, serif;
+        content: '⟩';
+        font-size: 150px;
+        color: #515a61;
+        text-shadow: 0 0 2px white;
+      }
+    }
+
+    .slick-prev {
+      font-family: 'Times New Roman', Times, serif;
+      left: -10%;
+
+      &::before {
+        font-family: 'Times New Roman', Times, serif;
+        content: '⟨';
+        font-size: 150px;
+        color: #515a61;
+        text-shadow: 0 0 2px white;
+      }
+    }
+
+    .slick-list {
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+
+      .slick-track {
+        height: 100%;
+
+        div {
+          height: 100%;
+
+          .item_slider {
+            position: relative;
+            cursor: grab;
 
             &:active {
-                scale: 0.98;
+              cursor: grabbing;
             }
+          }
         }
-
-        .slick-next {
-            font-family: 'Times New Roman', Times, serif;
-            right: -10%;
-
-            &::before {
-                font-family: 'Times New Roman', Times, serif;
-                content: '⟩';
-                font-size: 150px;
-                color: #515a61;
-                text-shadow: 0 0 2px white;
-            }
-        }
-
-        .slick-prev {
-            font-family: 'Times New Roman', Times, serif;
-            left: -10%;
-
-            &::before {
-                font-family: 'Times New Roman', Times, serif;
-                content: '⟨';
-                font-size: 150px;
-                color: #515a61;
-                text-shadow: 0 0 2px white;
-            }
-        }
-
-        .slick-list {
-            height: 100%;
-            overflow: hidden;
-            position: relative;
-
-            .slick-track {
-                height: 100%;
-
-                div {
-                    height: 100%;
-
-                    .item_slider {
-                        position: relative;
-                        cursor: grab;
-
-                        &:active {
-                            cursor: grabbing;
-                        }
-                    }
-                }
-            }
-        }
-
-        .slick-dots {
-            max-height: 40px;
-            overflow: hidden;
-            display: none !important;
-
-            li {
-                button {
-                    &::before {
-                        font-size: 10px;
-                    }
-                }
-            }
-        }
+      }
     }
+
+    .slick-dots {
+      max-height: 40px;
+      overflow: hidden;
+      display: none !important;
+
+      li {
+        button {
+          &::before {
+            font-size: 10px;
+          }
+        }
+      }
+    }
+  }
 }
 
 @media (width < 1200px) {
-    .container_slider {
-        h2 {
-            font-size: var(--fontSizeMobile) !important;
-        }
+  .container_slider {
+    h2 {
+      font-size: var(--fontSizeMobile) !important;
     }
+  }
 }
 
 @media (width < 900px) {
-    .slick-next {
-        &::before {
-            font-size: 100px !important;
-        }
+  .slick-next {
+    &::before {
+      font-size: 100px !important;
     }
+  }
 
-    .slick-prev {
-        &::before {
-            font-size: 100px !important;
-        }
+  .slick-prev {
+    &::before {
+      font-size: 100px !important;
     }
+  }
 }
 
 @media (width < 900px) {
-    .slick-next {
-        right: -12% !important;
+  .slick-next {
+    right: -12% !important;
 
-        &::before {
-            font-size: 100px !important;
-        }
+    &::before {
+      font-size: 100px !important;
     }
+  }
 
-    .slick-prev {
-        left: -12% !important;
+  .slick-prev {
+    left: -12% !important;
 
-        &::before {
-            font-size: 100px !important;
-        }
+    &::before {
+      font-size: 100px !important;
     }
+  }
 }
 
 @media (width < 500px) {
-    .slick-next {
-        right: -10% !important;
+  .slick-next {
+    right: -10% !important;
 
-        &::before {
-            font-size: 100px !important;
-        }
+    &::before {
+      font-size: 100px !important;
     }
+  }
 
-    .slick-prev {
-        left: -10% !important;
+  .slick-prev {
+    left: -10% !important;
 
-        &::before {
-            font-size: 100px !important;
-        }
+    &::before {
+      font-size: 100px !important;
     }
+  }
 }
 
 @media (width < 450px) {
-    .slick-next {
-        right: -12% !important;
+  .slick-next {
+    right: -12% !important;
 
-        &::before {
-            font-size: 50px !important;
-        }
+    &::before {
+      font-size: 50px !important;
     }
+  }
 
-    .slick-prev {
-        left: -12% !important;
+  .slick-prev {
+    left: -12% !important;
 
-        &::before {
-            font-size: 50px !important;
-        }
+    &::before {
+      font-size: 50px !important;
     }
+  }
 }

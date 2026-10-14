@@ -5,3 +5,6 @@ Dockerfile
 .dockerignore
 .next
 dist
+.codex
+.env*
+!.env.example

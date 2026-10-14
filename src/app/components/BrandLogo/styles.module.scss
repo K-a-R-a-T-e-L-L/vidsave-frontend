@@ -1,0 +1,20 @@
+.logo {
+  display: block;
+  flex-shrink: 0;
+  width: 220px;
+  aspect-ratio: 3 / 1;
+  background: url('/images/brand/logo-light.webp') center / contain no-repeat;
+}
+:global(html[data-mantine-color-scheme='dark']) .logo {
+  background-image: url('/images/brand/logo-dark.webp');
+}
+@media (max-width: 560px) {
+  .logo {
+    width: 190px;
+  }
+}
+@media (max-width: 360px) {
+  .logo {
+    width: 160px;
+  }
+}

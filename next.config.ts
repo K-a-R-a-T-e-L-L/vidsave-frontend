@@ -3,13 +3,8 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   output: 'standalone',
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'vidsave.ru',
-        port: ''
-      }
-    ],
+    localPatterns: [{ pathname: '/images/**', search: '' }],
+    qualities: [75, 85],
     formats: ['image/avif', 'image/webp'],
     minimumCacheTTL: 31536000,
   },

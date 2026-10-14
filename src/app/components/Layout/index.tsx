@@ -1,40 +1,27 @@
-'use client';
+import type { ContentItem } from '@/app/lib/cms-types';
+import type { CatalogService, CatalogCategory } from '@/app/lib/catalog-types';
 import Footer from '../Footer';
 import Header from '../Header';
-import style from './styles.module.scss';
 import Home from '../Home';
-import Information from '../Information';
-import Advantages from '../Advantages';
-import Contacts from '../Contacts';
-import PriceList from '../PriceList';
-import { useEffect, useLayoutEffect } from 'react';
-import { useGetSizingWindow } from '@/hooks/useGetSizingWindow/useGetSizingWindow';
-import { animated } from '@/app/lib/animated';
 
-const Layout: React.FC = () => {
-    const [Width] = useGetSizingWindow();
-
-    useEffect(() => {
-        document.documentElement.classList.remove('no-js');        
-    }, []);
-
-    useLayoutEffect(() => {
-        animated();
-    }, [Width]);
-
-    return (
-        <div className={style.layout}>
-            <Header />
-            <main className={style.layout__main}>
-                <Home />
-                <PriceList />
-                <Advantages />
-                <Information />
-                <Contacts />
-            </main>
-            <Footer />
-        </div>
-    );
-};
-
-export default Layout;
+export default function Layout({
+  services,
+  categories,
+  posts,
+  projects,
+}: {
+  services: CatalogService[];
+  categories: CatalogCategory[];
+  posts: ContentItem[];
+  projects: ContentItem[];
+}) {
+  return (
+    <div className="public-site">
+      <Header />
+      <main id="main-content" style={{ display: 'flex', flexDirection: 'column' }}>
+        <Home services={services} catalogCategories={categories} posts={posts} projects={projects} />
+      </main>
+      <Footer />
+    </div>
+  );
+}

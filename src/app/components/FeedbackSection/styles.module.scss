@@ -1,0 +1,123 @@
+.section {
+  width: min(100% - 48px, var(--site-container));
+  margin: 48px auto 80px;
+  padding: clamp(24px, 4vw, 56px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(28px, 5vw, 72px);
+  border: 1px solid var(--site-border);
+  border-radius: 28px;
+  background: var(--site-bg-secondary);
+  color: var(--site-text);
+  scroll-margin-top: 100px;
+}
+.intro {
+  align-self: center;
+  min-width: 0;
+}
+.eyebrow {
+  color: var(--site-accent);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.intro h2 {
+  margin: 18px 0;
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+.intro p {
+  color: var(--site-muted);
+  line-height: 1.8;
+}
+.steps {
+  display: flex;
+  gap: 12px;
+  margin: 28px 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--site-border);
+  color: var(--site-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.steps svg {
+  flex-shrink: 0;
+  color: var(--site-accent);
+}
+.contacts {
+  display: grid;
+  gap: 18px;
+}
+.contacts a {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+.contacts svg {
+  color: var(--site-accent);
+  flex-shrink: 0;
+}
+.contacts small {
+  display: block;
+  color: var(--site-muted);
+  margin-bottom: 4px;
+}
+.contacts strong {
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.form {
+  min-width: 0;
+  padding: clamp(20px, 3vw, 32px);
+  border: 1px solid var(--site-border);
+  border-radius: 20px;
+  background: var(--site-surface);
+  box-shadow: var(--site-card-shadow);
+}
+.form h3 {
+  margin: 0 0 8px;
+  font-size: 23px;
+}
+.form > p {
+  margin: 0 0 24px;
+  color: var(--site-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.form :global(.mantine-InputWrapper-label),
+.form :global(.mantine-Checkbox-label) {
+  color: var(--site-text);
+}
+.form :global(.mantine-Checkbox-label) {
+  line-height: 1.6;
+  font-size: 12px;
+}
+.form :global(.mantine-Checkbox-label) a {
+  color: var(--site-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.form :global(.mantine-Input-input) {
+  background: var(--site-bg);
+  border-color: var(--site-border);
+  color: var(--site-text);
+}
+.form :global(.mantine-Button-root) {
+  min-height: 46px;
+  background: var(--site-accent);
+  color: var(--site-on-accent);
+}
+@media (max-width: 760px) {
+  .section {
+    width: calc(100% - 32px);
+    grid-template-columns: 1fr;
+    padding: 22px;
+    margin: 32px auto 48px;
+    gap: 28px;
+  }
+  .form {
+    padding: 20px;
+  }
+}

@@ -1,54 +1,34 @@
-'use client';
+import type { Settings } from '@/app/lib/cms-types';
+import { siteConfig } from '@/app/lib/site';
 
-import { useEffect } from "react"
+const SchemaOrg = ({ settings }: { settings: Settings }) => {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    '@id': `${siteConfig.url}/#business`,
+    name: settings.companyName,
+    url: siteConfig.url,
+    logo: { '@type': 'ImageObject', url: `${siteConfig.url}/images/brand/mark.webp`, width: 512, height: 512 },
+    image: `${siteConfig.url}${siteConfig.ogImage}`,
+    description: settings.seoDescription || siteConfig.description,
+    telephone: settings.phone,
+    email: settings.email,
+    address: settings.address,
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: settings.latitude,
+      longitude: settings.longitude,
+    },
+    areaServed: settings.geography,
+    sameAs: [settings.vk, settings.avito, settings.telegram].filter(Boolean),
+  };
 
-const SchemaOrg = () => {
-    useEffect(() => {
-        const schema = {
-            '@context': 'https://schema.org',
-            '@type': 'localBusiness',
-            name: '«ВИДЕОХРАНИТЕЛЬ»',
-            image: '/images/project_13.jpg',
-            url: 'https://vidsave.ru',
-            telephone: '+7-904-574-52-07',
-            address: {
-                '@type': 'PostalAddress',
-                streetAddress: 'улица Шестакова 6А',
-                addressLocality: 'Кемерово',
-                addressRegion: 'Кемеровская область',
-                postalCode: '650000',
-                addressCountry: 'RU',
-            },
-            geo: {
-                '@type': 'GeoCoordinates',
-                latitude: '55.362173',
-                longitude: '86.068001',
-            },
-            serviceArea: 'Кемерово и область',
-            description: 'Установка видеонаблюдения, кондиционеров и электромонтажных работ',
-            aggregateRating: {
-                ratingValue: '5',
-                reviewCount: '39'
-            },
-            sameAs: [
-                'https://vidsave.ru',
-                'https://vk.com/khranitel_video',
-                'https://www.avito.ru/kemerovo/predlozheniya_uslug/videonablyudenie_ustanovkaprodazhaobsluzhivanie_3335539044',
-                'https://t.me/deniszaichuk'
-            ]
-        };
-        
-        const script = document.createElement('script');
-        script.type = 'application/ld+json';
-        script.innerHTML = JSON.stringify(schema);
-        document.head.appendChild(script);
-
-        return () => {
-            document.head.removeChild(script);
-        };
-    }, []);
-
-    return null;
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, '\\u003c') }}
+    />
+  );
 };
 
 export default SchemaOrg;

@@ -2,7 +2,4 @@ User-Agent: *
 
 Allow: /
 
-Disallow: /_next/
-Disallow: /static/
-
-Sitemap: https://vidsave.ru/sitemap.xml
+Sitemap: https://vidsave.karatell.ru/sitemap.xml

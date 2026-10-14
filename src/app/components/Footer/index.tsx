@@ -1,93 +1,53 @@
-import Link from 'next/link';
-import style from './styles.module.scss';
-import React from 'react';
+'use client';
 import Image from 'next/image';
+import BrandLogo from '../BrandLogo';
+import Link from 'next/link';
+import { useContactData } from '@/app/components/CmsContent';
+import { publicNavigation } from '@/app/lib/site';
+import styles from './styles.module.scss';
 
-type ListLinksType = {
-    url: string;
-    text: string;
-    target: string;
-}[];
+const navigation = [{ href: '/', label: 'Главная' }, ...publicNavigation];
 
-const Footer = () => {
-    const ListLinks: ListLinksType = [
-        {
-            url: '#home',
-            text: 'Главная',
-            target: '_self'
-        },
-        {
-            url: '#information',
-            text: 'О компании',
-            target: '_self'
-        },
-        {
-            url: '#contacts',
-            text: 'Контакты',
-            target: '_self'
-        },
-        {
-            url: 'tel:8-904-574-52-07',
-            text: '8-904-574-52-07',
-            target: '_blank'
-        },
-        {
-            url: '#priceList',
-            text: 'Услуги и цены',
-            target: '_self'
-        },
-        {
-            url: '#advantages',
-            text: 'Преимущества',
-            target: '_self'
-        },
-        {
-            url: 'mailto:denis.zaichuk@yandex.ru',
-            text: 'denis.zaichuk@yandex.ru',
-            target: '_blank'
-        }
-    ];
-
-    return (
-        <footer className={style.footer}>
-            <div className={style.footer__box}>
-                <nav className={style.box__navigation}>
-                    <ul className={style.navigation__list_link}>
-                        {ListLinks.map((el, i) => {
-                            return (
-                                <li key={i} className={`${style.list_link__link}`} tabIndex={0}>
-                                    <Link href={el.url} target={el.target}>{el.text}</Link>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </nav>
-                <div className={style.box__info}>
-                    <h4 className={`${style.info__title}`}>Торгово-монтажная компания «ВИДЕОХРАНИТЕЛЬ»</h4>
-                    <hr className={`${style.info__decoration_line}`} />
-                    <h6 className={`${style.info__description}`}>
-                        ИП Зайчук Денис Евгеньевич ИНН 423085052501 ЕГРИП 324420500109616 650010 Россия, Кемеровская область —
-                        Кузбасс, г. Кемерово, ул. Тельбесская, д. 61
-                    </h6>
-                </div>
-                <span className={style.developer}>
-                    Проект создан:	&nbsp;
-                    <Link href={"https://el-solo.karatell.ru"} target='_blank'>
-                        El Solo
-                        <div>
-                            <Image
-                                src={`/images/logo_el_solo.png`}
-                                alt={"Логотип разработчика El Solo"}
-                                style={{ objectFit: 'cover' }}
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                fill
-                            />
-                        </div>
-                    </Link>
-                </span>
-            </div>
-        </footer>
-    );
-};
-
-export default Footer;
+export default function Footer() {
+  const { contactData, settings } = useContactData();
+  return (
+    <footer className={styles.footer}>
+      <div className={styles.inner}>
+        <div className={styles.top}>
+          <Link href="/" className={styles.brand} aria-label="ВИДЕОХРАНИТЕЛЬ — на главную">
+            <BrandLogo />
+          </Link>
+          <nav className={styles.nav} aria-label="Навигация в подвале">
+            {navigation.map((item) => (
+              <Link href={item.href} key={item.label}>
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+          <Link className={styles.phone} href={contactData.phoneHref}>
+            {contactData.phoneLabel}
+          </Link>
+        </div>
+        <div className={styles.bottom}>
+          <p className={styles.legal}>
+            {settings.geography}
+            <br />
+            {contactData.legalName} · ИНН {contactData.inn} · ЕГРИП {contactData.egrip}
+            <br />
+            {contactData.legalAddress}
+          </p>
+          <Link className={styles.legalEmail} href={'mailto:' + contactData.legalEmail}>
+            {contactData.legalEmail}
+          </Link>
+          <span className={styles.credit}>
+            Проект создан:{' '}
+            <Link href="https://el-solo.karatell.ru" target="_blank" rel="noreferrer">
+              El Solo
+              <Image src="/images/logo_el_solo.png" alt="Логотип разработчика El Solo" width={24} height={24} />
+            </Link>
+          </span>
+        </div>
+      </div>
+    </footer>
+  );
+}

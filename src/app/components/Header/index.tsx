@@ -1,109 +1,131 @@
 'use client';
-import Image from 'next/image';
-import style from './styles.module.scss';
-import React, { useEffect, useState } from 'react';
+
+import { ActionIcon, Burger, Button, Drawer, Tooltip } from '@mantine/core';
+import { useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
+import { IconArrowUpRight, IconMoon, IconPhone, IconSun } from '@tabler/icons-react';
+import BrandLogo from '../BrandLogo';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+import { useContactData } from '@/app/components/CmsContent';
+import { publicNavigation } from '@/app/lib/site';
+import styles from './styles.module.scss';
 
-type ListLinksType = {
-    url: string;
-    text: string;
-    class: string;
-}[];
+const navigation = publicNavigation;
 
-const Header = () => {
-    const [ListLinks, setListLinks] = useState<ListLinksType>([
-        { url: 'priceList', text: 'Услуги', class: '' },
-        { url: 'advantages', text: 'Преимущества', class: '' },
-        { url: 'information', text: 'О компании', class: '' },
-        { url: 'contacts', text: 'Контакты', class: '' },
-    ]);
+export default function Header() {
+  const { contactData } = useContactData();
+  const pathname = usePathname();
+  const [menuOpened, setMenuOpened] = useState(false);
+  const { setColorScheme } = useMantineColorScheme();
+  const computedColorScheme = useComputedColorScheme('light', { getInitialValueInEffect: true });
+  const isDark = computedColorScheme === 'dark';
 
-    const [HeaderClass, setHeaderClass] = useState(false);
-    const [BurgerMenu, setBurgerMenu] = useState(false);
+  const closeMenu = () => setMenuOpened(false);
+  const toggleTheme = () => setColorScheme(isDark ? 'light' : 'dark');
+  const requestHref = '#request';
+  const active = (href: string) => pathname === href || pathname.startsWith(href + '/');
 
-    useEffect(() => {
-        const Observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    try {
-                        if (entry.isIntersecting) {
-                            setListLinks((prevState) => {
-                                const newLinks = prevState.map((el) => {
-                                    if (el.url === entry.target.id) {
-                                        return {
-                                            ...el,
-                                            class: el.class === 'link_active' ? '' : 'link_active',
-                                        };
-                                    } else {
-                                        return { ...el, class: '' };
-                                    }
-                                });
-                                return newLinks;
-                            });
-                        }
-                    } catch (error) {
-                        console.log(error);
-                    }
-                });
-            },
-            { threshold: 0.3 },
-        );
+  return (
+    <header className={styles.header}>
+      <div className={styles.inner}>
+        <Link href="/" className={styles.brand} aria-label="ВИДЕОХРАНИТЕЛЬ — на главную">
+          <BrandLogo />
+        </Link>
 
-        document.querySelectorAll('#home, #priceList, #advantages, #information, #contacts').forEach((el) => {
-            if (el) Observer.observe(el);
-        });
-    }, []);
+        <nav className={styles.desktopNav} aria-label="Основная навигация">
+          {navigation.map((item) => (
+            <Link
+              className={styles.navLink}
+              href={item.href}
+              key={item.href}
+              aria-current={active(item.href) ? 'page' : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
 
-    useEffect(() => {
-        const handleScrollPage = () => {
-            if (window.scrollY === 0) setHeaderClass(false);
-            else setHeaderClass(true);
-        };
+        <div className={styles.actions}>
+          <div className={styles.location}>
+            Кемерово <span>и область</span>
+          </div>
+          <Link
+            className={styles.phone}
+            href={contactData.phoneHref}
+            aria-label={'Позвонить: ' + contactData.phoneLabel}
+          >
+            <IconPhone size={17} aria-hidden="true" />
+            <span>{contactData.phoneLabel}</span>
+          </Link>
+          <Tooltip label="Переключить цветовую тему" withArrow>
+            <ActionIcon
+              className={styles.themeButton}
+              variant="default"
+              size="lg"
+              radius="xl"
+              onClick={toggleTheme}
+              aria-label="Переключить цветовую тему"
+              title="Переключить цветовую тему"
+            >
+              <IconMoon className={styles.darkThemeIcon} size={19} aria-hidden="true" />
+              <IconSun className={styles.lightThemeIcon} size={19} aria-hidden="true" />
+            </ActionIcon>
+          </Tooltip>
+          <Button
+            component={Link}
+            href={requestHref}
+            className={styles.headerCta}
+            rightSection={<IconArrowUpRight size={17} />}
+          >
+            Связаться
+          </Button>
+          <Burger
+            className={styles.mobileBurger}
+            opened={menuOpened}
+            onClick={() => setMenuOpened((opened) => !opened)}
+            aria-label={menuOpened ? 'Закрыть меню' : 'Открыть меню'}
+            aria-expanded={menuOpened}
+            aria-controls="mobile-navigation"
+          />
+        </div>
+      </div>
 
-        handleScrollPage();
-
-        window.addEventListener('scroll', handleScrollPage, { passive: true });
-
-        return () => window.removeEventListener('scroll', handleScrollPage);
-    }, []);
-
-    return (
-        <header className={`${style.header} ${HeaderClass ? style.header_active : ''}`}>
-            <div className={style.header__unification}>
-                <Link href="/#home" className={`${style.header__mini_info}`}>
-                    <div className={style.mini_info__logo_box}>
-                        <Image
-                            alt="Логотип компании видеохранитель"
-                            src={'/images/logo.png'}
-                            style={{ objectFit: 'contain' }}
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            fill
-                            priority
-                        />
-                    </div>
-                    ВИДЕОХРАНИТЕЛЬ
-                </Link>
-                <nav className={`${style.header__navigation} ${BurgerMenu ? style.header__navigation_burger : ''}`}>
-                    <button
-                        className={`${style.navigation__burger} ${BurgerMenu ? style.navigation__burger_active : ''}`}
-                        onClick={() => setBurgerMenu(!BurgerMenu)}
-                        aria-label='Открыть меню навигации'
-                    ></button>
-                    <ul className={style.navigation__list_link}>
-                        {ListLinks.map((el, i) => {
-                            return (
-                                <li key={i} className={`${style.list_link__link} ${el.class} `}>
-                                    <Link href={`/#${el.url}`} onClick={() => (BurgerMenu ? setBurgerMenu(false) : null)}>
-                                        {el.text}
-                                    </Link>
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </nav>
-            </div>
-        </header>
-    );
-};
-
-export default Header;
+      <Drawer
+        opened={menuOpened}
+        onClose={closeMenu}
+        title={<span className={styles.drawerTitle}>Навигация</span>}
+        position="right"
+        size="min(88vw, 380px)"
+        id="mobile-navigation"
+        classNames={{ content: styles.drawerContent, header: styles.drawerHeader, body: styles.drawerBody }}
+      >
+        <nav className={styles.mobileNav} aria-label="Мобильная навигация">
+          {navigation.map((item) => (
+            <Link
+              href={item.href}
+              key={item.href}
+              onClick={closeMenu}
+              aria-current={active(item.href) ? 'page' : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
+          <Link className={styles.mobilePhone} href={contactData.phoneHref} onClick={closeMenu}>
+            <IconPhone size={18} aria-hidden="true" /> {contactData.phoneLabel}
+          </Link>
+          <Button
+            component={Link}
+            href={requestHref}
+            onClick={closeMenu}
+            fullWidth
+            className={styles.mobileCta}
+            rightSection={<IconArrowUpRight size={17} />}
+          >
+            Получить консультацию
+          </Button>
+        </nav>
+      </Drawer>
+    </header>
+  );
+}

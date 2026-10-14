@@ -1,136 +1,89 @@
 'use client';
-import Image from 'next/image';
-import style from './styles.module.scss';
-import Map from '../Map';
+import { IconAt, IconArrowUpRight, IconBrandTelegram, IconBrandVk, IconMapPin, IconPhone } from '@tabler/icons-react';
 import Link from 'next/link';
+import { useContactData } from '@/app/components/CmsContent';
+import Map from '../Map';
+import styles from './styles.module.scss';
 
-const Contacts = () => {
-    const ListLinks = [
-        {
-            icon: 'email_icon.png',
-            title: 'Электронная почта',
-            description: 'Отправьте нам письмо с вашими вопросами',
-            link: ['mail@khranitelvideo.ru'],
-            alt: 'Иконка электронной почты яндекс',
-        },
-        {
-            icon: 'telephone_icon.png',
-            title: 'Телефон',
-            description: 'Позвоните нам по номеру',
-            link: ['8-904-574-52-07'],
-            alt: 'Иконка телефона',
-        },
-        {
-            icon: 'avito_icon.png',
-            title: 'Авито',
-            description: 'Найдите нас на популярной торговой площадке',
-            link: ['https://www.avito.ru/kemerovo/predlozheniya_uslug/videonablyudenie_ustanovkaprodazhaobsluzhivanie_3335539044'],
-            alt: 'Иконка авито',
-        },
-        {
-            icon: 'tg_icon.png',
-            title: 'Телеграм',
-            description: 'Напишите нам в Telegram для быстрой связи',
-            link: ['https://t.me/deniszaichuk'],
-            alt: 'Иконка телеграма',
-        },
-        {
-            icon: 'vk_icon.png',
-            title: 'ВКонтакте',
-            description: 'Подпишитесь на нашу страницу и будьте в курсе новостей',
-            link: ['https://vk.com/khranitel_video'],
-            alt: 'Иконка ВКонтакте',
-        },
-    ];
-
-    return (
-        <section className={style.contacts} id="contacts">
-            <div className={style.contacts__box_text}>
-                <h2 className={`${style.box_text__title}`}>Свяжитесь с нами</h2>
-                <p className={`${style.box_text__description}`}>Мы всегда готовы ответить на ваши вопросы.</p>
+export default function Contacts() {
+  const { companyData, contactData, settings } = useContactData();
+  const contacts = [
+    {
+      label: 'Телефон',
+      value: contactData.phoneLabel,
+      href: contactData.phoneHref,
+      icon: <IconPhone size={20} aria-hidden="true" />,
+    },
+    {
+      label: 'Электронная почта',
+      value: companyData.email,
+      href: `mailto:${companyData.email}`,
+      icon: <IconAt size={20} aria-hidden="true" />,
+    },
+    {
+      label: 'Telegram',
+      value: 'Написать в Telegram',
+      href: companyData.sameAs[2],
+      icon: <IconBrandTelegram size={20} aria-hidden="true" />,
+    },
+    {
+      label: 'ВКонтакте',
+      value: 'Страница компании',
+      href: companyData.sameAs[0],
+      icon: <IconBrandVk size={20} aria-hidden="true" />,
+    },
+    {
+      label: 'Авито',
+      value: 'Страница компании',
+      href: companyData.sameAs[1],
+      icon: <IconArrowUpRight size={20} aria-hidden="true" />,
+    },
+  ];
+  return (
+    <section className={styles.contacts} id="contacts" aria-labelledby="contacts-title">
+      <div className={styles.container}>
+        <div className={styles.heading}>
+          <span className={styles.eyebrow}>Контакты</span>
+          <h2 id="contacts-title">Будем на связи</h2>
+          {settings.hours && <p>{settings.hours}</p>}
+          <p>Выберите удобный способ связаться с компанией.</p>
+        </div>
+        <div className={styles.grid}>
+          <div className={styles.contactList}>
+            {contacts
+              .filter((contact) => !!contact.href)
+              .map((contact) => (
+                <Link
+                  className={styles.contactCard}
+                  href={contact.href}
+                  key={contact.label}
+                  target={contact.href.startsWith('https://') ? '_blank' : undefined}
+                  rel={contact.href.startsWith('https://') ? 'noreferrer' : undefined}
+                >
+                  <span className={styles.icon}>{contact.icon}</span>
+                  <span className={styles.contactText}>
+                    <span className={styles.label}>{contact.label}</span>
+                    <span className={styles.value}>{contact.value}</span>
+                  </span>
+                </Link>
+              ))}
+            <div className={styles.address}>
+              <IconMapPin size={20} aria-hidden="true" />
+              <span>{contactData.addressLabel}</span>
             </div>
-            <div className={style.contacts__box_contacts}>
-                <div className={style.box_contacts__container}>
-                    {ListLinks.map((el, i) => {
-                        return (
-                            <div className={style.container__contact} key={i}>
-                                <div className={style.contact__icon_box}>
-                                    <div className={style.icon_box__icon}>
-                                        <div className={style.icon__icon}>
-                                            <Image
-                                                src={`/images/${el.icon}`}
-                                                alt={el.alt}
-                                                style={{ objectFit: 'contain' }}
-                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                fill
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className={style.contact__text_content}>
-                                    <h3 className={style.text_content__title}>{el.title}</h3>
-                                    <p className={style.text_content__description}>{el.description}</p>
-                                    {el.link.length === 2 ? (
-                                        <>
-                                            <Link target="_blank" className={`${style.text_content__link}`} href={`tel:${el.link[0]}`}>
-                                                {el.link[0]}
-                                            </Link>
-                                            <Link target="_blank" className={`${style.text_content__link}`} href={`tel:${el.link[1]}`}>
-                                                {el.link[1]}
-                                            </Link>
-                                        </>
-                                    ) : (
-                                        <Link
-                                            target="_blank"
-                                            className={`${style.text_content__link}`}
-                                            href={`${el.title === 'Электронная почта' ? 'mailto:' : ''}${el.link[0]}`}
-                                        >
-                                            {el.link}
-                                        </Link>
-                                    )}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-                <div className={style.box_contacts__maps}>
-                    <Map
-                        latitude={55.362173}
-                        longitude={86.068001}
-                        address="Кемерово, Шестакова 6А"
-                        title="Яндекс карты"
-                        sizes={['100%', '80%']}
-                        borderRadius="20px"
-                    />
-                    <div className={style.maps__info}>
-                        <div className={style.info__contacts_buttons}>
-                            <div className={style.contacts_buttons__line}></div>
-                            {ListLinks.map((el, i) => {
-                                return (
-                                    <Link
-                                        target="_blank"
-                                        key={i}
-                                        href={`${el.title === 'Электронная почта' ? 'mailto:' : (el.title === 'Телефон' ? 'tel:' : '')}${el.link[0]}`}
-                                        className={`${style.contacts_buttons__link}`}
-                                    >
-                                        <Image
-                                            src={`/images/colored_${el.icon}`}
-                                            alt={el.alt}
-                                            style={{ objectFit: 'cover' }}
-                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                            fill
-                                        />
-                                    </Link>
-                                );
-                            })}
-                            <div className={style.contacts_buttons__line}></div>
-                        </div>
-                        <h5 className={`${style.info__address}`}>Россия, г. Кемерово, ул. Шестакова, д. 6А</h5>
-                    </div>
-                </div>
-            </div>
-        </section>
-    );
-};
-
-export default Contacts;
+          </div>
+          <div className={styles.map}>
+            <Map
+              latitude={companyData.latitude}
+              longitude={companyData.longitude}
+              address={contactData.mapAddress}
+              title={'Карта: ' + contactData.mapAddress}
+              sizes={['100%', '100%']}
+              borderRadius="24px"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
