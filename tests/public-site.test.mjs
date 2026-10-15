@@ -595,7 +595,22 @@ test(
             await page.getByRole('button', { name: 'Переключить цветовую тему', exact: true }).click();
           await page.reload({ waitUntil: 'networkidle' });
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
+          // Reproduce slow render-blocking styles: hero discovery must not wait for them.
+          await page.route('**/*.css', async (route) => {
+            const response = await route.fetch();
+            await new Promise((resolve) => setTimeout(resolve, 1500));
+            await route.fulfill({ response });
+          });
           await page.goto(origin + '/', { waitUntil: 'networkidle' });
+          await page.unroute('**/*.css');
+          const earlyHero = await page.evaluate(() => {
+            const resources = performance.getEntriesByType('resource');
+            const hero = resources.find((entry) => /\/hero-(light|dark)-\d+\.avif/.test(entry.name));
+            const styles = resources.filter((entry) => entry.name.endsWith('.css'));
+            return { start: hero?.startTime, cssEnd: Math.min(...styles.map((entry) => entry.responseEnd)) };
+          });
+          assert.ok(earlyHero.start < earlyHero.cssEnd, 'Hero starts before blocking CSS completes');
+          console.log('CSS-independent hero', width, theme, earlyHero);
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
           const expectedHero = `/images/media-pack/hero-${theme}-${width <= 960 ? '960' : '1920'}.avif`;
           assert.equal(
