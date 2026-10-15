@@ -1,4 +1,5 @@
 'use client';
+import FaqSchema from '../FaqSchema';
 
 import FeedbackSection from '../FeedbackSection';
 import ContentCard from '../ContentCard';
@@ -242,7 +243,13 @@ function QuickLinks() {
       <div className={`${styles.container} ${styles.quickGrid}`}>
         {links.map((link) => (
           <Link className={styles.quickCard} href={link.href} key={link.title}>
-            <Image src={link.image} alt={link.alt} fill sizes="(max-width: 720px) 90vw, 33vw" />
+            <Image
+              src={link.image}
+              alt={link.alt}
+              fill
+              quality={60}
+              sizes="(max-width: 600px) calc(100vw - 36px), (max-width: 1288px) 31vw, 400px"
+            />
             <span className={styles.quickShade} />
             <span className={styles.quickBadge}>{link.icon}</span>
             <span className={styles.quickBody}>
@@ -552,11 +559,19 @@ function Geography() {
 
 function Questions() {
   const { companyData, contactData } = useContactData();
-  const faq = questions;
+  const faq = questions.map((item) =>
+    item.question === 'Как обсудить задачу?'
+      ? {
+          ...item,
+          answer: 'Позвоните по номеру ' + contactData.phoneLabel + ' или напишите на ' + companyData.email + '.',
+        }
+      : item,
+  );
   return (
     <ManagedSection title="Что важно знать перед обращением" className={`${styles.section} ${styles.faq}`} id="faq">
       <div className={styles.container}>
         <SectionHeading eyebrow="Вопросы и ответы" title="Что важно знать перед обращением" />
+        <FaqSchema items={faq} />
         <Accordion
           classNames={{
             root: styles.accordion,
@@ -571,14 +586,7 @@ function Questions() {
                 <PageText value={item.question} />
               </Accordion.Control>
               <Accordion.Panel>
-                <PageText
-                  value={
-                    item.question === 'Как обсудить задачу?' &&
-                    item.answer === questions.find((q) => q.question === item.question)?.answer
-                      ? 'Позвоните по номеру ' + contactData.phoneLabel + ' или напишите на ' + companyData.email + '.'
-                      : item.answer
-                  }
-                />
+                <PageText value={item.answer} />
               </Accordion.Panel>
             </Accordion.Item>
           ))}

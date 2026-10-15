@@ -16,7 +16,7 @@ export async function generateMetadata({ params, searchParams }: Props) {
       category.seoDescription || category.excerpt || `Материалы раздела «${category.title}».`,
       `/blog/category/${slug}${page > 1 ? '?page=' + page : ''}`,
     )),
-    robots: { index: list.total > 0, follow: true },
+    robots: { index: list.total > 0, follow: true, 'max-image-preview': 'large' as const },
   };
 }
 export default async function Page({ params, searchParams }: Props) {

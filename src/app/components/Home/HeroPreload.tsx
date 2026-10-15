@@ -4,7 +4,7 @@ export default function HeroPreload() {
   return (
     <script
       dangerouslySetInnerHTML={{
-        __html: `(function(){var theme=document.documentElement.getAttribute('data-mantine-color-scheme')==='dark'?'dark':'light';var size=matchMedia('(max-width: 960px)').matches?'960':'1920';var link=document.createElement('link');link.rel='preload';link.as='image';link.type='image/avif';link.fetchPriority='high';link.href='/images/media-pack/hero-'+theme+'-'+size+'.avif';document.head.appendChild(link);})();`,
+        __html: `(function(){if(location.pathname!=='/')return;var theme=document.documentElement.getAttribute('data-mantine-color-scheme')==='dark'?'dark':'light';var size=matchMedia('(max-width: 960px)').matches?'960':'1920';var link=document.createElement('link');link.rel='preload';link.as='image';link.type='image/avif';link.fetchPriority='high';link.href='/images/media-pack/hero-'+theme+'-'+size+'.avif';document.head.appendChild(link);})();`,
       }}
     />
   );

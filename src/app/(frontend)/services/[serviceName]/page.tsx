@@ -28,6 +28,8 @@ export default async function Page({ params }: Props) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Service',
+    '@id': absoluteUrl('/services/' + service.slug + '#service'),
+    image: service.imagePath ? absoluteUrl(service.imagePath) : undefined,
     name: service.name,
     description: service.description,
     serviceType: service.category.name,

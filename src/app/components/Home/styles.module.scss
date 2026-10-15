@@ -173,7 +173,7 @@
 .heroActions :global(.mantine-Button-root:first-child),
 .consultationActions :global(.mantine-Button-root:first-child) {
   background: var(--site-accent);
-  color: #fff;
+  color: var(--site-on-accent);
 }
 
 .heroActions :global(.mantine-Button-root:nth-child(2)),
@@ -477,7 +477,7 @@
 .filterActive {
   border-color: var(--site-accent);
   background: var(--site-accent);
-  color: #fff;
+  color: var(--site-on-accent);
 }
 
 .serviceGrid {

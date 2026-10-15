@@ -1,4 +1,5 @@
 import type { Settings } from '@/app/lib/cms-types';
+import { structuredAddress } from '@/app/lib/structured-address';
 import { siteConfig } from '@/app/lib/site';
 
 const SchemaOrg = ({ settings }: { settings: Settings }) => {
@@ -13,7 +14,7 @@ const SchemaOrg = ({ settings }: { settings: Settings }) => {
     description: settings.seoDescription || siteConfig.description,
     telephone: settings.phone,
     email: settings.email,
-    address: settings.address,
+    address: structuredAddress(settings.address),
     geo: {
       '@type': 'GeoCoordinates',
       latitude: settings.latitude,

@@ -1,3 +1,5 @@
+import JsonLd from '@/app/components/JsonLd';
+import { siteConfig } from '@/app/lib/site';
 import { siteMetadata } from '@/app/lib/cms';
 import Image from '@/app/components/MediaImage';
 import { getContentDetail } from '@/app/lib/cms';
@@ -36,8 +38,37 @@ export default async function Page({ params }: Props) {
         { label: item.title, href: `/projects/${item.slug}` },
       ]}
     >
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'CreativeWork',
+          '@id': absoluteUrl('/projects/' + item.slug + '#project'),
+          url: absoluteUrl('/projects/' + item.slug),
+          mainEntityOfPage: absoluteUrl('/projects/' + item.slug),
+          name: item.title,
+          description: item.excerpt,
+          inLanguage: 'ru-RU',
+          datePublished: item.publishedAt || undefined,
+          dateModified: item.updatedAt,
+          publisher: { '@id': siteConfig.url + '/#business' },
+          image: [
+            ...new Set(
+              [item.coverUrl, ...(item.galleryIds ?? []).map((id) => '/media/' + id)].filter(
+                (url): url is string => !!url,
+              ),
+            ),
+          ].map(absoluteUrl),
+          about: item.services?.map((service) => ({
+            '@type': 'Service',
+            '@id': absoluteUrl('/services/' + service.slug + '#service'),
+            name: service.name,
+            url: absoluteUrl('/services/' + service.slug),
+          })),
+        }}
+      />
       {item.coverUrl && (
         <Image
+          priority
           src={item.coverUrl}
           alt={item.coverAlt || item.title}
           width={1200}

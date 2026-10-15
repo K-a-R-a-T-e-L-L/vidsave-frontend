@@ -1,3 +1,4 @@
+import JsonLd from '../JsonLd';
 import { pageMedia } from '@/app/lib/page-media';
 import FeedbackSection from '../FeedbackSection';
 import type { ReactNode } from 'react';
@@ -165,6 +166,18 @@ export function InfoCards({ items }: { items: { title: string; text: string }[] 
 export function ServicePreview({ services }: { services: CatalogService[] }) {
   return services.length ? (
     <div className={styles.grid}>
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          itemListElement: services.map((service, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: service.name,
+            url: absoluteUrl('/services/' + service.slug),
+          })),
+        }}
+      />
       {services.map((service) => (
         <article className={styles.card} key={service.id}>
           {service.imagePath && (

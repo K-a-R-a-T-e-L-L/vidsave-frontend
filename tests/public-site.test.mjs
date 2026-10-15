@@ -25,6 +25,7 @@ const mediaBytes = await sharp('public/images/design-preview/hero-light.webp')
   .resize(1200)
   .webp({ quality: 90 })
   .toBuffer();
+const publicContent = { posts: [], projects: [], 'blog-categories': [] };
 let mediaPublished = true;
 let unavailable = false;
 let frontend, backend, temp, origin;
@@ -203,9 +204,26 @@ test.before(async () => {
     }
     if (url.pathname === '/api/content/bootstrap')
       res.end(JSON.stringify({ ...content, pages: [], settings: { ...content.settings, ...adminContacts } }));
-    else if (['/api/content/posts', '/api/content/projects', '/api/content/blog-categories'].includes(url.pathname))
-      res.end(JSON.stringify({ items: [], total: 0, page: 1, limit: 12 }));
-    else if (url.pathname === '/api/content/lead-config') res.end(JSON.stringify({ enabled: false }));
+    else if (/^\/api\/content\/(posts|projects|blog-categories)(?:\/[^/]+)?$/.test(url.pathname)) {
+      const [, , , kind, slug] = url.pathname.split('/');
+      const items = publicContent[kind].filter((item) => item.status === 'published');
+      if (slug) {
+        const item = items.find((item) => item.slug === decodeURIComponent(slug));
+        res.statusCode = item ? 200 : 404;
+        res.end(JSON.stringify(item ?? {}));
+      } else {
+        const limit = Number(url.searchParams.get('limit') || 12);
+        const current = Number(url.searchParams.get('page') || 1);
+        res.end(
+          JSON.stringify({
+            items: items.slice((current - 1) * limit, current * limit),
+            total: items.length,
+            page: current,
+            limit,
+          }),
+        );
+      }
+    } else if (url.pathname === '/api/content/lead-config') res.end(JSON.stringify({ enabled: false }));
     else if (url.pathname === '/api/catalog/categories') res.end(JSON.stringify({ items: fixture.categories }));
     else if (url.pathname === '/api/catalog/services') {
       const items = records
@@ -328,7 +346,7 @@ test('all sections have one server-rendered H1, distinct metadata and canonical;
       titles.push(html.match(/<title>([^<]*)/)[1]);
       descriptions.push(attribute(html, 'description'));
       assert.equal(attribute(html, 'robots'), 'index, follow, max-image-preview:large');
-    } else assert.equal(attribute(html, 'robots'), 'noindex, follow');
+    } else assert.equal(attribute(html, 'robots'), 'noindex, follow, max-image-preview:large');
     const schemas = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map((match) =>
       JSON.parse(match[1]),
     );
@@ -592,6 +610,29 @@ test(
           );
           assert.equal(heroRequests.length, 1, 'Only the visible theme and viewport hero should download');
           assert.ok(heroRequests[0].endsWith(expectedHero));
+          if (process.env.VIDSAVE_AXE_SCRIPT) {
+            await page.addScriptTag({ content: await readFile(process.env.VIDSAVE_AXE_SCRIPT, 'utf8') });
+            const audit = await page.evaluate(async () => {
+              const result = await window.axe.run(document, { runOnly: ['color-contrast'] });
+              return result.violations.map((v) => ({
+                id: v.id,
+                nodes: v.nodes.map((n) => ({ target: n.target, summary: n.failureSummary })),
+              }));
+            });
+            assert.deepEqual(audit, [], 'Contrast: ' + width + '/' + theme);
+          }
+          console.log(
+            'Hero timing',
+            width,
+            theme,
+            await page.evaluate(() => {
+              const nav = performance.getEntriesByType('navigation')[0];
+              const image = performance
+                .getEntriesByType('resource')
+                .find((r) => /hero-(light|dark)-\d+\.avif/.test(r.name));
+              return { discoveryAfterFirstByte: image?.startTime - nav.responseStart };
+            }),
+          );
           await page.screenshot({
             path: path.join(screenshots, 'home-' + width + '-' + theme + '.png'),
             fullPage: true,
@@ -665,4 +706,153 @@ test('brand icons and web manifest have valid public assets', async () => {
   assert.match(html, /rel="manifest"/);
   assert.match(html, /images\/brand\/mark.webp/);
   assert.match(html, /images\/brand\/social.jpg/);
+});
+
+function jsonLd(html) {
+  return [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map((match) =>
+    JSON.parse(match[1]),
+  );
+}
+test('FAQ schema matches rendered answers and contact address follows current settings', async () => {
+  for (const route of ['/', '/for-home', '/for-business']) {
+    const html = await page(route);
+    const faq = jsonLd(html).find((item) => item['@type'] === 'FAQPage');
+    assert.ok(faq?.mainEntity.length, route);
+    for (const item of faq.mainEntity) {
+      assert.equal(item['@type'], 'Question');
+      assert.equal(item.acceptedAnswer['@type'], 'Answer');
+      // Exclude JSON-LD and RSC scripts: answers must exist in visible/expandable HTML too.
+      const visible = html.replace(/<script[\s\S]*?<\/script>/g, '');
+      assert.ok(visible.includes(item.name), route + ' question');
+      assert.ok(visible.includes(item.acceptedAnswer.text), route + ' answer');
+    }
+  }
+  const original = adminContacts.address;
+  try {
+    adminContacts.address = 'Россия, 650000, г. Проверочный, ул. Новая, д. 2';
+    const business = jsonLd(await page('/')).find((item) => item['@type'] === 'LocalBusiness');
+    assert.equal(business.address.addressCountry, 'RU');
+    assert.equal(business.address.addressLocality, 'Проверочный');
+    assert.equal(business.address.streetAddress, 'ул. Новая, д. 2');
+    assert.equal(business.address.postalCode, '650000');
+    assert.equal(business.priceRange, undefined);
+    adminContacts.address = 'Адрес уточняется';
+    const changed = jsonLd(await page('/')).find((item) => item['@type'] === 'LocalBusiness');
+    assert.deepEqual(changed.address, { '@type': 'PostalAddress', name: 'Адрес уточняется' });
+  } finally {
+    adminContacts.address = original;
+  }
+});
+test('new service schemas use live prices and disappear after withdrawal', async () => {
+  const service = {
+    ...published[0],
+    id: 'future-service',
+    legacyId: null,
+    slug: 'future-service',
+    name: 'Новая услуга',
+    priceMode: 'fixed',
+    priceRub: '1250.50',
+    status: 'published',
+  };
+  records.push(service);
+  try {
+    for (const mode of ['fixed', 'from', 'on_request']) {
+      service.priceMode = mode;
+      const schema = jsonLd(await page('/services/future-service')).find((item) => item['@type'] === 'Service');
+      assert.equal(schema.name, service.name);
+      assert.equal(schema.url, 'https://vidsave.karatell.ru/services/future-service');
+      assert.equal(schema.provider['@id'], 'https://vidsave.karatell.ru/#business');
+      assert.ok(schema.image.startsWith('https://'));
+      if (mode === 'fixed') {
+        assert.equal(schema.offers.price, '1250.50');
+        assert.equal(schema.offers.priceCurrency, 'RUB');
+      } else assert.equal(schema.offers, undefined);
+    }
+    service.priceMode = 'fixed';
+    service.priceRub = null;
+    assert.equal(
+      jsonLd(await page('/services/future-service')).find((item) => item['@type'] === 'Service').offers,
+      undefined,
+    );
+    service.status = 'hidden';
+    await page('/services/future-service', 404);
+    assert.ok(!(await page('/sitemap.xml')).includes('future-service'));
+  } finally {
+    records.splice(records.indexOf(service), 1);
+  }
+});
+test('new blog and portfolio schemas follow publication, edits, media and deletion', async () => {
+  const title = 'Новая запись </script><script>alert(1)</script>';
+  for (const [kind, route, type] of [
+    ['posts', '/blog', 'BlogPosting'],
+    ['projects', '/projects', 'CreativeWork'],
+  ]) {
+    const item = {
+      id: 'future-' + kind,
+      slug: 'future-' + kind,
+      title,
+      excerpt: 'Описание',
+      status: 'draft',
+      seoTitle: null,
+      seoDescription: null,
+      coverId: mediaId,
+      coverUrl: '/media/' + mediaId,
+      ogImageUrl: null,
+      body: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Содержимое записи' }] }] },
+      categories: [],
+      services: [published[0]],
+      galleryIds: [mediaId],
+      publishedAt: '2026-10-01T10:00:00.000Z',
+      createdAt: '2026-10-01T09:00:00.000Z',
+      updatedAt: '2026-10-02T11:00:00.000Z',
+    };
+    publicContent[kind].push(item);
+    const url = route + '/' + item.slug;
+    try {
+      await page(url, 404);
+      item.status = 'published';
+      const html = await page(url);
+      const schema = jsonLd(html).find((entry) => entry['@type'] === type);
+      assert.equal(schema.headline || schema.name, title);
+      assert.equal(schema.datePublished, item.publishedAt);
+      assert.equal(schema.dateModified, item.updatedAt);
+      assert.equal(schema.url, 'https://vidsave.karatell.ru' + url);
+      assert.ok(JSON.stringify(schema.image).includes('https://vidsave.karatell.ru/media/'));
+      assert.ok(!html.includes('<script>alert(1)</script>'));
+      const crumbs = jsonLd(html).find((entry) => entry['@type'] === 'BreadcrumbList');
+      assert.equal(crumbs.itemListElement.at(-1).item, schema.url);
+      const list = jsonLd(await page(route)).find((entry) => entry['@type'] === 'ItemList');
+      assert.equal(list.itemListElement[0].url, schema.url);
+      assert.ok((await page('/sitemap.xml')).includes(item.slug));
+      item.title = 'Обновлено';
+      item.updatedAt = '2026-10-03T11:00:00.000Z';
+      const updated = jsonLd(await page(url)).find((entry) => entry['@type'] === type);
+      assert.equal(updated.headline || updated.name, 'Обновлено');
+      assert.equal(updated.dateModified, item.updatedAt);
+      item.status = 'archived';
+      await page(url, 404);
+      assert.ok(!(await page('/sitemap.xml')).includes(item.slug));
+    } finally {
+      publicContent[kind].splice(publicContent[kind].indexOf(item), 1);
+    }
+    await page(url, 404);
+  }
+});
+
+test('static preview optimization reduces transferred bytes without changing dimensions', async () => {
+  for (const name of ['preview-home', 'preview-business']) {
+    const request = async (q) => {
+      const response = await fetch(
+        origin + '/_next/image?url=' + encodeURIComponent('/images/media-pack/' + name + '.webp') + '&w=640&q=' + q,
+        { headers: { accept: 'image/webp' } },
+      );
+      assert.equal(response.status, 200);
+      return Buffer.from(await response.arrayBuffer());
+    };
+    const before = await request(75),
+      after = await request(60);
+    assert.equal((await sharp(after).metadata()).width, (await sharp(before).metadata()).width);
+    assert.ok(after.length < before.length * 0.9, name + ': ' + before.length + ' -> ' + after.length);
+    console.log('Preview bytes', name, before.length, '->', after.length);
+  }
 });

@@ -1,3 +1,4 @@
+import HeroPreload from '@/app/components/Home/HeroPreload';
 import { brandMetadata } from '@/app/lib/brand-metadata';
 import '@mantine/core/styles.css';
 import { CmsProvider } from '@/app/components/CmsContent';
@@ -66,6 +67,7 @@ export default async function RootLayout({
     <html lang="ru" {...mantineHtmlProps} className={`${manropeCyrillic.variable} ${manropeLatin.variable}`}>
       <head>
         <ColorSchemeScript defaultColorScheme="light" localStorageKey="vidsave_theme" />
+        <HeroPreload />
       </head>
       <body>
         <ThemeProvider>

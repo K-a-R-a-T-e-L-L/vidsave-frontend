@@ -1,4 +1,5 @@
 'use client';
+import FaqSchema from '../FaqSchema';
 import { createContext, useContext, type ReactNode, type ComponentProps } from 'react';
 import type { ImageProps } from 'next/image';
 import MediaImage from '../MediaImage';
@@ -38,6 +39,7 @@ export function EditableImage(props: ImageProps) {
 export function EditableFaq({ fallback }: { fallback: { question: string; answer: string }[] }) {
   return (
     <div>
+      <FaqSchema items={fallback} />
       {fallback.map((item) => (
         <details key={item.question} className="cms-faq">
           <summary>{item.question}</summary>

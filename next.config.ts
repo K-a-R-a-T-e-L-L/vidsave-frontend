@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
   },
   images: {
     localPatterns: [{ pathname: '/images/**', search: '' }],
-    qualities: [75, 85],
+    qualities: [60, 75, 85],
     // Pre-encoded hero AVIFs are served directly. Avoid expensive cold AVIF encoding on the VPS.
     formats: ['image/webp'],
     minimumCacheTTL: 31536000,

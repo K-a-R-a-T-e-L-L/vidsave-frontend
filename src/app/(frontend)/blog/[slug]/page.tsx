@@ -38,9 +38,10 @@ export default async function Page({ params }: Props) {
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
+    '@id': absoluteUrl(`/blog/${item.slug}#article`),
     headline: item.title,
     description: item.excerpt,
-    datePublished: item.publishedAt,
+    datePublished: item.publishedAt || undefined,
     dateModified: item.updatedAt,
     url: absoluteUrl(`/blog/${item.slug}`),
     image: item.coverUrl ? absoluteUrl(item.coverUrl) : undefined,
@@ -64,6 +65,7 @@ export default async function Page({ params }: Props) {
       />
       {item.coverUrl && (
         <Image
+          priority
           src={item.coverUrl}
           alt={item.coverAlt || item.title}
           width={1200}

@@ -14,7 +14,7 @@ export async function generateMetadata({ searchParams }: Props) {
       'Опубликованные материалы компании о видеонаблюдении, монтаже и обслуживании.',
       '/blog' + (page > 1 ? '?page=' + page : ''),
     )),
-    robots: { index: list.total > 0 && !query.search, follow: true },
+    robots: { index: list.total > 0 && !query.search, follow: true, 'max-image-preview': 'large' as const },
   };
 }
 export default async function Page({ searchParams }: Props) {

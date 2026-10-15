@@ -1,3 +1,5 @@
+import JsonLd from '../JsonLd';
+import { absoluteUrl } from '@/app/lib/site';
 import { notFound } from 'next/navigation';
 import ContentCard from '../ContentCard';
 import Link from 'next/link';
@@ -37,6 +39,20 @@ export async function ContentListing({
       }
       path={category ? `/blog/category/${category}` : path}
     >
+      {result.items.length > 0 && (
+        <JsonLd
+          data={{
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            itemListElement: result.items.map((item, index) => ({
+              '@type': 'ListItem',
+              position: (page - 1) * result.limit + index + 1,
+              name: item.title,
+              url: absoluteUrl(path + '/' + item.slug),
+            })),
+          }}
+        />
+      )}
       {kind === 'posts' && (
         <>
           <form action={path} className="content-search">
