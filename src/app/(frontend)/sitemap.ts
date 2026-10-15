@@ -6,8 +6,8 @@ import { getPublishedServices } from '@/app/lib/catalog';
 export const dynamic = 'force-dynamic';
 
 const sitemap = async () => {
-  const services = await getPublishedServices();
-  const [posts, projects, categories, bootstrap] = await Promise.all([
+  const [services, posts, projects, categories, bootstrap] = await Promise.all([
+    getPublishedServices(),
     allPublishedContent('posts'),
     allPublishedContent('projects'),
     allPublishedContent('blog-categories'),

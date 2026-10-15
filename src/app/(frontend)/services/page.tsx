@@ -18,7 +18,7 @@ export async function generateMetadata({ searchParams }: Props) {
     String(pageMetadata.description),
     '/services',
   );
-  return { ...metadata, robots: { index: metadata.robots.index && !query.category, follow: true } };
+  return { ...metadata, robots: { ...metadata.robots, index: metadata.robots.index && !query.category } };
 }
 export const dynamic = 'force-dynamic';
 export default async function Page({ searchParams }: Props) {

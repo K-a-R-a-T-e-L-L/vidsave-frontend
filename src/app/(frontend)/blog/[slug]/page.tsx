@@ -14,15 +14,20 @@ export async function generateMetadata({ params }: Props) {
     item.seoDescription?.trim() || toMetaDescription(item.excerpt),
     `/blog/${item.slug}`,
   );
+  const image = item.ogImageUrl || item.coverUrl;
+  const images = image ? [{ url: absoluteUrl(image), alt: item.coverAlt || item.title }] : metadata.openGraph?.images;
   return {
     ...metadata,
     openGraph: {
       ...metadata.openGraph,
       type: 'article' as const,
-      images:
-        item.ogImageUrl || item.coverUrl
-          ? [{ url: absoluteUrl(item.ogImageUrl || item.coverUrl!) }]
-          : metadata.openGraph?.images,
+      publishedTime: item.publishedAt || undefined,
+      modifiedTime: item.updatedAt,
+      images,
+    },
+    twitter: {
+      ...metadata.twitter,
+      images: image ? [absoluteUrl(image)] : [absoluteUrl(siteConfig.ogImage)],
     },
   };
 }
@@ -41,6 +46,7 @@ export default async function Page({ params }: Props) {
     image: item.coverUrl ? absoluteUrl(item.coverUrl) : undefined,
     publisher: { '@id': `${siteConfig.url}/#business` },
     mainEntityOfPage: absoluteUrl(`/blog/${item.slug}`),
+    inLanguage: 'ru-RU',
   };
   return (
     <PublicPage

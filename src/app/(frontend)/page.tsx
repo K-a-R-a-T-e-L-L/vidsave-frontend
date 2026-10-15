@@ -1,5 +1,6 @@
 import { cmsPageMetadata, getContentList } from '@/app/lib/cms';
 import Layout from '@/app/components/Layout';
+import HeroPreload from '@/app/components/Home/HeroPreload';
 import { siteConfig } from '@/app/lib/site';
 import { getPublishedServices, getPublishedCategories } from '@/app/lib/catalog';
 
@@ -15,5 +16,10 @@ export default async function Home() {
     getContentList('posts', 'limit=3'),
     getContentList('projects', 'limit=3'),
   ]);
-  return <Layout services={services} categories={categories} posts={posts.items} projects={projects.items} />;
+  return (
+    <>
+      <HeroPreload />
+      <Layout services={services} categories={categories} posts={posts.items} projects={projects.items} />
+    </>
+  );
 }

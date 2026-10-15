@@ -59,7 +59,10 @@ export async function siteMetadata(title: string, description: string, path: str
 }
 export async function cmsPageMetadata(id: string, fallbackTitle: string, fallbackDescription: string, path: string) {
   void id;
-  return { ...(await siteMetadata(fallbackTitle, fallbackDescription, path)), robots: { index: true, follow: true } };
+  return {
+    ...(await siteMetadata(fallbackTitle, fallbackDescription, path)),
+    robots: { index: true, follow: true, 'max-image-preview': 'large' as const },
+  };
 }
 export async function allPublishedContent(kind: 'posts' | 'projects' | 'blog-categories') {
   const first = await getContentList(kind, 'limit=50&page=1');

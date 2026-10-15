@@ -24,7 +24,8 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
       colorSchemeManager={colorSchemeManager}
       theme={{
         primaryColor: 'blue',
-        fontFamily: 'Manrope Variable, Manrope, sans-serif',
+        fontFamily:
+          "var(--font-manrope-cyrillic, 'Manrope Variable'), var(--font-manrope-latin, Manrope), Arial, sans-serif",
         components: {
           Modal: { defaultProps: { closeButtonProps: { 'aria-label': 'Закрыть' } } },
           Drawer: { defaultProps: { closeButtonProps: { 'aria-label': 'Закрыть' } } },

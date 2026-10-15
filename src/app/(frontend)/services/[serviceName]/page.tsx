@@ -34,6 +34,17 @@ export default async function Page({ params }: Props) {
     url: absoluteUrl('/services/' + service.slug),
     areaServed: settings.geography,
     provider: { '@id': siteConfig.url + '/#business' },
+    ...(service.priceMode === 'fixed' && service.priceRub !== null
+      ? {
+          offers: {
+            '@type': 'Offer',
+            url: absoluteUrl('/services/' + service.slug),
+            price: service.priceRub,
+            priceCurrency: 'RUB',
+            ...(service.unitLabel ? { description: service.unitLabel } : {}),
+          },
+        }
+      : {}),
   };
   const related = services
     .filter((item) => item.id !== service.id && item.category.id === service.category.id)

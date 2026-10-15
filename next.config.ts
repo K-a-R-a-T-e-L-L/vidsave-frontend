@@ -2,10 +2,23 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  async headers() {
+    return [
+      {
+        source: '/images/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=86400, stale-while-revalidate=604800' }],
+      },
+      {
+        source: '/api/:path*',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
+      },
+    ];
+  },
   images: {
     localPatterns: [{ pathname: '/images/**', search: '' }],
     qualities: [75, 85],
-    formats: ['image/avif', 'image/webp'],
+    // Pre-encoded hero AVIFs are served directly. Avoid expensive cold AVIF encoding on the VPS.
+    formats: ['image/webp'],
     minimumCacheTTL: 31536000,
   },
 };

@@ -327,7 +327,7 @@ test('all sections have one server-rendered H1, distinct metadata and canonical;
     if (indexable.includes(route)) {
       titles.push(html.match(/<title>([^<]*)/)[1]);
       descriptions.push(attribute(html, 'description'));
-      assert.equal(attribute(html, 'robots'), 'index, follow');
+      assert.equal(attribute(html, 'robots'), 'index, follow, max-image-preview:large');
     } else assert.equal(attribute(html, 'robots'), 'noindex, follow');
     const schemas = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map((match) =>
       JSON.parse(match[1]),
@@ -359,6 +359,10 @@ test('all 23 existing service URLs and prices survive; hidden, draft and unknown
       .find((item) => item['@type'] === 'Service');
     assert.equal(schema.name, service.name);
     assert.equal(schema.description, service.description);
+    if (service.priceMode === 'fixed') {
+      assert.equal(schema.offers.price, service.priceRub);
+      assert.equal(schema.offers.priceCurrency, 'RUB');
+    } else assert.equal(schema.offers, undefined, 'A starting price must not be presented as a fixed offer');
   }
   for (const slug of ['fixture-hidden', 'fixture-draft', 'not-an-existing-service']) {
     assert.ok(!catalog.includes(`/services/${slug}`));
@@ -366,11 +370,25 @@ test('all 23 existing service URLs and prices survive; hidden, draft and unknown
   }
 });
 
+test('public HTML preloads fonts and static images cache without exposing CMS media', async () => {
+  const response = await fetch(origin + '/');
+  const html = await response.text();
+  // React may emit resource hints in the HTTP Link header instead of HTML.
+  const hints = (response.headers.get('link') ?? '') + html;
+  assert.equal(new Set(hints.match(/[^\s<>";,]+\.woff2/g) ?? []).size, 2);
+  assert.match(html, /max-image-preview:large/);
+  const image = await fetch(`${origin}/images/brand/logo-light.webp`);
+  assert.equal(image.status, 200);
+  assert.match(image.headers.get('cache-control'), /max-age=86400/);
+  const api = await fetch(`${origin}/api/admin/me`);
+  assert.match(api.headers.get('x-robots-tag'), /noindex/);
+});
+
 test('seven category filters work in server HTML and use an unfiltered canonical', async () => {
   assert.equal(fixture.categories.length, 7);
   for (const category of fixture.categories) {
     const html = await page(`/services?category=${category.slug}`);
-    assert.equal(attribute(html, 'robots'), 'noindex, follow');
+    assert.equal(attribute(html, 'robots'), 'noindex, follow, max-image-preview:large');
     assert.ok(html.includes('<link rel="canonical" href="https://vidsave.karatell.ru/services"'));
     for (const service of published)
       assert.equal(html.includes(`/services/${service.slug}`), service.category.id === category.id);
@@ -561,6 +579,19 @@ test(
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
           await page.goto(origin + '/', { waitUntil: 'networkidle' });
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
+          const expectedHero = `/images/media-pack/hero-${theme}-${width <= 960 ? '960' : '1920'}.avif`;
+          assert.equal(
+            await page.locator('link[rel="preload"][as="image"][type="image/avif"]').getAttribute('href'),
+            expectedHero,
+          );
+          const heroRequests = await page.evaluate(() =>
+            performance
+              .getEntriesByType('resource')
+              .filter((entry) => /\/hero-(light|dark)-\d+\.avif/.test(entry.name))
+              .map((entry) => entry.name),
+          );
+          assert.equal(heroRequests.length, 1, 'Only the visible theme and viewport hero should download');
+          assert.ok(heroRequests[0].endsWith(expectedHero));
           await page.screenshot({
             path: path.join(screenshots, 'home-' + width + '-' + theme + '.png'),
             fullPage: true,

@@ -67,7 +67,7 @@ export const createPageMetadata = (title: string, description: string, path: str
   title,
   description,
   alternates: { canonical: absoluteUrl(path) },
-  robots: { index: true, follow: true },
+  robots: { index: true, follow: true, 'max-image-preview': 'large' },
   openGraph: {
     type: 'website',
     title: `${title} | «ВИДЕОХРАНИТЕЛЬ»`,
@@ -75,7 +75,7 @@ export const createPageMetadata = (title: string, description: string, path: str
     url: absoluteUrl(path),
     siteName: siteConfig.name,
     locale: 'ru_RU',
-    images: [{ url: siteConfig.ogImage, alt: description }],
+    images: [{ url: siteConfig.ogImage, width: 1200, height: 630, alt: description }],
   },
   twitter: {
     card: 'summary_large_image',

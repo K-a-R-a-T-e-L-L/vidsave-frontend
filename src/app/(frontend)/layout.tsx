@@ -2,7 +2,7 @@ import { brandMetadata } from '@/app/lib/brand-metadata';
 import '@mantine/core/styles.css';
 import { CmsProvider } from '@/app/components/CmsContent';
 import { getCmsBootstrap } from '@/app/lib/cms';
-import '@fontsource-variable/manrope';
+import { manropeCyrillic, manropeLatin } from '@/app/lib/fonts';
 import '@/app/styles/globals.css';
 import type { Metadata } from 'next';
 import { ColorSchemeScript, mantineHtmlProps } from '@mantine/core';
@@ -63,7 +63,7 @@ export default async function RootLayout({
   void privacyBody;
   void consentBody;
   return (
-    <html lang="ru" {...mantineHtmlProps}>
+    <html lang="ru" {...mantineHtmlProps} className={`${manropeCyrillic.variable} ${manropeLatin.variable}`}>
       <head>
         <ColorSchemeScript defaultColorScheme="light" localStorageKey="vidsave_theme" />
       </head>
