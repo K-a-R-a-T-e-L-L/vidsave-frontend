@@ -1,6 +1,6 @@
 import HeroPreload from '@/app/components/Home/HeroPreload';
 import { brandMetadata } from '@/app/lib/brand-metadata';
-import '@mantine/core/styles.css';
+import '@/app/styles/public-mantine';
 import { CmsProvider } from '@/app/components/CmsContent';
 import { getCmsBootstrap } from '@/app/lib/cms';
 import { manropeCyrillic, manropeLatin } from '@/app/lib/fonts';

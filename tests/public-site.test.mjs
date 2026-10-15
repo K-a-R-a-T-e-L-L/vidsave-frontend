@@ -610,6 +610,23 @@ test(
           );
           assert.equal(heroRequests.length, 1, 'Only the visible theme and viewport hero should download');
           assert.ok(heroRequests[0].endsWith(expectedHero));
+          const cssBytes = await page.evaluate(() =>
+            performance
+              .getEntriesByType('resource')
+              .filter((entry) => entry.name.includes('/_next/') && entry.name.endsWith('.css'))
+              .reduce((sum, entry) => sum + entry.decodedBodySize, 0),
+          );
+          assert.ok(cssBytes > 0 && cssBytes < 150_000, `Public CSS budget exceeded: ${cssBytes}`);
+          console.log('Public CSS bytes', width, theme, cssBytes);
+          if (width === 375) {
+            await page.getByRole('button', { name: 'Открыть меню', exact: true }).click();
+            const drawer = page.getByRole('dialog');
+            await drawer.waitFor();
+            const box = await drawer.boundingBox();
+            assert.ok(box.width > 250 && box.width <= width, 'Mobile drawer remains sized to viewport');
+            await page.keyboard.press('Escape');
+            await drawer.waitFor({ state: 'hidden' });
+          }
           if (process.env.VIDSAVE_AXE_SCRIPT) {
             await page.addScriptTag({ content: await readFile(process.env.VIDSAVE_AXE_SCRIPT, 'utf8') });
             const audit = await page.evaluate(async () => {
