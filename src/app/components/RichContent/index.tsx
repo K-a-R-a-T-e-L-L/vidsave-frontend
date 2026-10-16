@@ -3,8 +3,8 @@ import Image from '@/app/components/MediaImage';
 import type { RichNode } from '@/app/lib/cms-types';
 
 export function RichContent({ document, privateMedia = false }: { document: RichNode; privateMedia?: boolean }) {
-  function render(node: RichNode, key: string): ReactNode {
-    const children = (node.content ?? []).map((child, index) => render(child, `${key}-${index}`));
+  function render(node: RichNode, key: string, headerRow = false): ReactNode {
+    const children = (node.content ?? []).map((child, index) => render(child, `${key}-${index}`, headerRow));
     if (node.type === 'text') {
       let text: ReactNode = node.text ?? '';
       for (const mark of node.marks ?? []) {
@@ -46,7 +46,18 @@ export function RichContent({ document, privateMedia = false }: { document: Rich
       case 'bulletList':
         return <ul key={key}>{children}</ul>;
       case 'orderedList':
-        return <ol key={key}>{children}</ol>;
+        return (
+          <ol
+            key={key}
+            start={
+              typeof node.attrs?.start === 'number' && Number.isSafeInteger(node.attrs.start)
+                ? node.attrs.start
+                : undefined
+            }
+          >
+            {children}
+          </ol>
+        );
       case 'listItem':
         return <li key={key}>{children}</li>;
       case 'blockquote':
@@ -71,14 +82,25 @@ export function RichContent({ document, privateMedia = false }: { document: Rich
           />
         );
       }
-      case 'table':
+      case 'table': {
+        const rows = node.content ?? [];
+        // Only promote an unambiguous, non-spanning first header row.
+        const first = rows[0];
+        const hasHeader =
+          first?.type === 'tableRow' &&
+          !!first.content?.length &&
+          first.content.every(
+            (cell) => cell.type === 'tableHeader' && (!cell.attrs?.rowspan || cell.attrs.rowspan === 1),
+          );
         return (
           <div key={key} className="rich-table">
             <table>
-              <tbody>{children}</tbody>
+              {hasHeader && <thead>{render(first, `${key}-head`, true)}</thead>}
+              <tbody>{rows.slice(hasHeader ? 1 : 0).map((row, index) => render(row, `${key}-row-${index}`))}</tbody>
             </table>
           </div>
         );
+      }
       case 'tableRow':
         return <tr key={key}>{children}</tr>;
       case 'tableCell':
@@ -95,6 +117,7 @@ export function RichContent({ document, privateMedia = false }: { document: Rich
         return (
           <th
             key={key}
+            scope={headerRow && (!node.attrs?.colspan || node.attrs.colspan === 1) ? 'col' : undefined}
             colSpan={typeof node.attrs?.colspan === 'number' ? node.attrs.colspan : undefined}
             rowSpan={typeof node.attrs?.rowspan === 'number' ? node.attrs.rowspan : undefined}
           >

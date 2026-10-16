@@ -838,6 +838,38 @@ test('new blog and portfolio schemas follow publication, edits, media and deleti
       createdAt: '2026-10-01T09:00:00.000Z',
       updatedAt: '2026-10-02T11:00:00.000Z',
     };
+    if (kind === 'posts') {
+      const paragraph = (text) => ({ type: 'paragraph', content: [{ type: 'text', text }] });
+      const cell = (type, text, attrs = {}) => ({ type, attrs, content: [paragraph(text)] });
+      item.body = {
+        type: 'doc',
+        content: [
+          { type: 'heading', attrs: { level: 2 }, content: [{ type: 'text', text: 'Раздел статьи' }] },
+          {
+            type: 'orderedList',
+            attrs: { start: 5 },
+            content: [{ type: 'listItem', content: [paragraph('Пятый пункт')] }],
+          },
+          {
+            type: 'table',
+            content: [
+              { type: 'tableRow', content: [cell('tableHeader', 'Услуга'), cell('tableHeader', 'Цена')] },
+              { type: 'tableRow', content: [cell('tableCell', 'Монтаж'), cell('tableCell', '100')] },
+            ],
+          },
+          {
+            type: 'table',
+            content: [
+              {
+                type: 'tableRow',
+                content: [cell('tableHeader', 'Общий заголовок', { rowspan: 2 }), cell('tableHeader', 'Колонка')],
+              },
+              { type: 'tableRow', content: [cell('tableCell', 'Значение')] },
+            ],
+          },
+        ],
+      };
+    }
     publicContent[kind].push(item);
     const url = route + '/' + item.slug;
     try {
@@ -851,6 +883,19 @@ test('new blog and portfolio schemas follow publication, edits, media and deleti
       assert.equal(schema.url, 'https://vidsave.karatell.ru' + url);
       assert.ok(JSON.stringify(schema.image).includes('https://vidsave.karatell.ru/media/'));
       assert.ok(!html.includes('<script>alert(1)</script>'));
+      if (kind === 'posts') {
+        const article = html.match(/<article>([\s\S]*?)<\/article>/)?.[1];
+        assert.ok(article, 'Blog content has an article landmark');
+        assert.equal((article.match(/<h1[ >]/g) || []).length, 1);
+        assert.ok(article.includes('<time dateTime=') || article.includes('<time datetime='));
+        assert.match(article, /<h2><span>Раздел статьи<\/span><\/h2>/);
+        assert.match(article, /<ol start="5">/);
+        assert.match(article, /<thead><tr><th scope="col">/);
+        assert.match(article, /<\/thead><tbody><tr><td>/);
+        assert.match(article, /<table><tbody><tr><th rowSpan="2">/i);
+        assert.ok(!article.includes('Другие материалы'));
+        assert.ok(!article.includes('id="request"'));
+      }
       const crumbs = jsonLd(html).find((entry) => entry['@type'] === 'BreadcrumbList');
       assert.equal(crumbs.itemListElement.at(-1).item, schema.url);
       const list = jsonLd(await page(route)).find((entry) => entry['@type'] === 'ItemList');

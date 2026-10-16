@@ -1,7 +1,7 @@
 import JsonLd from '../JsonLd';
 import { pageMedia } from '@/app/lib/page-media';
 import FeedbackSection from '../FeedbackSection';
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import Image from '@/app/components/MediaImage';
 import Link from 'next/link';
 import { absoluteUrl } from '@/app/lib/site';
@@ -93,6 +93,8 @@ export function PublicPage({
   image,
   crumbs,
   children,
+  article = false,
+  afterContent,
 }: {
   title: string;
   description: string;
@@ -100,19 +102,25 @@ export function PublicPage({
   image?: string;
   crumbs?: Crumb[];
   children: ReactNode;
+  article?: boolean;
+  afterContent?: ReactNode;
 }) {
+  const Content = article ? 'article' : Fragment;
   return (
     <div className="public-site">
       <Header />
       <main className={styles.main} id="main-content">
         <Breadcrumbs items={crumbs ?? [{ label: title, href: path }]} />
-        <PageHero
-          title={title}
-          description={description}
-          image={pageMedia[path]?.src ?? image}
-          imageAlt={pageMedia[path]?.alt}
-        />
-        {children}
+        <Content>
+          <PageHero
+            title={title}
+            description={description}
+            image={pageMedia[path]?.src ?? image}
+            imageAlt={pageMedia[path]?.alt}
+          />
+          {children}
+        </Content>
+        {afterContent}
         <FeedbackSection />
       </main>
       <Footer />

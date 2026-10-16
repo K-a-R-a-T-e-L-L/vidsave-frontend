@@ -51,6 +51,18 @@ export default async function Page({ params }: Props) {
   };
   return (
     <PublicPage
+      article
+      afterContent={
+        <PageSection title="Другие материалы">
+          {related.items
+            .filter((post) => post.id !== item.id)
+            .map((post) => (
+              <p key={post.id}>
+                <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+              </p>
+            ))}
+        </PageSection>
+      }
       title={item.title}
       description={item.excerpt}
       path={`/blog/${item.slug}`}
@@ -89,15 +101,6 @@ export default async function Page({ params }: Props) {
           </Link>
         ))}
       </nav>
-      <PageSection title="Другие материалы">
-        {related.items
-          .filter((post) => post.id !== item.id)
-          .map((post) => (
-            <p key={post.id}>
-              <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-            </p>
-          ))}
-      </PageSection>
     </PublicPage>
   );
 }
