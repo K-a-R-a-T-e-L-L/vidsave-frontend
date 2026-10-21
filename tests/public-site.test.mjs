@@ -612,7 +612,7 @@ test(
           assert.ok(earlyHero.start < earlyHero.cssEnd, 'Hero starts before blocking CSS completes');
           console.log('CSS-independent hero', width, theme, earlyHero);
           assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false);
-          const expectedHero = `/images/media-pack/hero-${theme}-${width <= 960 ? '960' : '1920'}.avif`;
+          const expectedHero = `/images/home-v2/hero-${theme}-${width <= 960 ? '960' : '1920'}.avif`;
           assert.equal(
             await page.locator('link[rel="preload"][as="image"][type="image/avif"]').getAttribute('href'),
             expectedHero,
@@ -933,3 +933,124 @@ test('static preview optimization reduces transferred bytes without changing dim
     console.log('Preview bytes', name, before.length, '->', after.length);
   }
 });
+
+test(
+  'home redesign: responsive themes, navigation, semantics and image budget',
+  { skip: process.env.VIDSAVE_HOME_BROWSER_TESTS !== '1', timeout: 240000 },
+  async () => {
+    const { chromium } = await import('@playwright/test');
+    const browser = await chromium.launch({ headless: false });
+    const cdp = await browser.newBrowserCDPSession();
+    console.log('Home browser PIDs', JSON.stringify((await cdp.send('SystemInfo.getProcessInfo')).processInfo));
+    await cdp.detach();
+    const screenshots = await mkdtemp(path.join(os.tmpdir(), 'vidsave-home-redesign-'));
+    try {
+      for (const width of [1280, 390, 768, 320])
+        for (const theme of ['light', 'dark']) {
+          const context = await browser.newContext({ viewport: { width, height: width > 1000 ? 760 : 1000 } });
+          await context.addInitScript((theme) => {
+            localStorage.setItem('vidsave_theme', theme);
+            window.__homeMetrics = { cls: 0, lcp: 0 };
+            new PerformanceObserver((list) => {
+              for (const e of list.getEntries()) if (!e.hadRecentInput) window.__homeMetrics.cls += e.value;
+            }).observe({ type: 'layout-shift', buffered: true });
+            new PerformanceObserver((list) => {
+              window.__homeMetrics.lcp = list.getEntries().at(-1)?.startTime || 0;
+            }).observe({ type: 'largest-contentful-paint', buffered: true });
+          }, theme);
+          await context.route('**/*', (route) =>
+            new URL(route.request().url()).origin === origin ? route.continue() : route.abort(),
+          );
+          const page = await context.newPage();
+          const errors = [];
+          page.on('pageerror', (e) => errors.push(e.message));
+          const response = await page.goto(origin + '/', { waitUntil: 'networkidle', timeout: 90000 });
+          assert.equal(response.status(), 200);
+          await page.evaluate(() => document.fonts.ready);
+          assert.equal(await page.locator('h1').count(), 1);
+          assert.match(await page.locator('h1').innerText(), /Надёжное/);
+          assert.equal(await page.locator('main').count(), 1);
+          assert.equal(await page.locator('#solutions h2').count(), 3);
+          assert.equal(await page.locator('html').getAttribute('data-mantine-color-scheme'), theme);
+          assert.equal(
+            await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1),
+            false,
+            `Overflow at ${width} ${theme}`,
+          );
+          const expected = `/images/home-v2/hero-${theme}-${width <= 960 ? 960 : 1920}.avif`;
+          const resources = await page.evaluate(() =>
+            performance
+              .getEntriesByType('resource')
+              .map((e) => ({ name: e.name, bytes: e.encodedBodySize, decoded: e.decodedBodySize })),
+          );
+          const heroes = resources.filter((e) => /\/hero-(light|dark)-\d+\.(avif|webp)/.test(e.name));
+          assert.equal(heroes.length, 1, 'Download only the selected theme/size, without duplicate fallback');
+          assert.ok(heroes[0].name.endsWith(expected));
+          assert.ok(heroes[0].bytes > 0 && heroes[0].bytes < 100000);
+          const cssBytes = resources.filter((e) => /\.css/.test(e.name)).reduce((sum, e) => sum + e.decoded, 0);
+          assert.ok(cssBytes < 150000, `CSS budget: ${cssBytes}`);
+          const heroBox = await page.locator('#home').boundingBox();
+          assert.ok(Math.abs(heroBox.y) <= 1, 'Hero background continues behind header');
+          const headerBox = await page.locator('header').boundingBox();
+          const titleBox = await page.locator('h1').boundingBox();
+          assert.ok(titleBox.y >= headerBox.height, 'Title clears header');
+          if (process.env.VIDSAVE_AXE_SCRIPT) {
+            await page.addScriptTag({ content: await readFile(process.env.VIDSAVE_AXE_SCRIPT, 'utf8') });
+            const violations = await page.evaluate(async () =>
+              (
+                await window.axe.run(
+                  { include: ['header', '#home', '#solutions'] },
+                  { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } },
+                )
+              ).violations.map((v) => ({
+                id: v.id,
+                impact: v.impact,
+                nodes: v.nodes.map((n) => ({ target: n.target, failureSummary: n.failureSummary })),
+              })),
+            );
+            assert.deepEqual(violations, [], 'Home accessibility: ' + JSON.stringify(violations));
+          }
+          if (width === 1280 || width === 390)
+            await page.screenshot({ path: path.join(screenshots, `home-${width}-${theme}.png`) });
+          console.log(
+            'Home metrics',
+            width,
+            theme,
+            JSON.stringify({
+              ...(await page.evaluate(() => window.__homeMetrics)),
+              heroBytes: heroes[0].bytes,
+              cssBytes,
+            }),
+          );
+          if (width === 1280) {
+            await page.locator('header summary').click();
+            await page.keyboard.press('Escape');
+            assert.equal(await page.locator('header details').getAttribute('open'), null);
+            await page.locator('header summary').click();
+            await page.getByRole('link', { name: 'Для дома', exact: true }).first().click();
+            await page.waitForURL(origin + '/for-home');
+            assert.equal(await page.locator('header details').getAttribute('open'), null);
+            await page.goto(origin + '/', { waitUntil: 'networkidle' });
+          } else {
+            await page.getByRole('button', { name: 'Открыть меню', exact: true }).click();
+            await page.getByRole('dialog').waitFor();
+            await page.keyboard.press('Escape');
+            await page.getByRole('dialog').waitFor({ state: 'hidden' });
+          }
+          await page.getByRole('button', { name: 'Переключить цветовую тему', exact: true }).click();
+          assert.equal(
+            await page.locator('html').getAttribute('data-mantine-color-scheme'),
+            theme === 'light' ? 'dark' : 'light',
+          );
+          await page.locator('#home a[href="#request"]').click();
+          await page.waitForURL(origin + '/#request');
+          await page.locator('#request').waitFor();
+          assert.deepEqual(errors, []);
+          await context.close();
+        }
+      console.log('Home screenshots', screenshots);
+    } finally {
+      await browser.close();
+    }
+  },
+);

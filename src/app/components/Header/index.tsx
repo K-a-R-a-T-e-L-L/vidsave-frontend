@@ -2,7 +2,7 @@
 
 import { ActionIcon, Burger, Button, Drawer, Tooltip } from '@mantine/core';
 import { useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
-import { IconArrowUpRight, IconMoon, IconPhone, IconSun } from '@tabler/icons-react';
+import { IconArrowUpRight, IconMoon, IconPhone, IconSun, IconMapPin, IconChevronDown } from '@tabler/icons-react';
 import BrandLogo from '../BrandLogo';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -14,7 +14,7 @@ import styles from './styles.module.scss';
 const navigation = publicNavigation;
 
 export default function Header() {
-  const { contactData } = useContactData();
+  const { contactData, settings } = useContactData();
   const pathname = usePathname();
   const [menuOpened, setMenuOpened] = useState(false);
   const { setColorScheme } = useMantineColorScheme();
@@ -27,28 +27,62 @@ export default function Header() {
   const active = (href: string) => pathname === href || pathname.startsWith(href + '/');
 
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} ${pathname === '/' ? styles.homeHeader : ''}`}>
       <div className={styles.inner}>
         <Link href="/" className={styles.brand} aria-label="ВИДЕОХРАНИТЕЛЬ — на главную">
           <BrandLogo />
         </Link>
 
         <nav className={styles.desktopNav} aria-label="Основная навигация">
-          {navigation.map((item) => (
-            <Link
-              className={styles.navLink}
-              href={item.href}
-              key={item.href}
-              aria-current={active(item.href) ? 'page' : undefined}
-            >
-              {item.label}
-            </Link>
-          ))}
+          <details
+            className={styles.serviceMenu}
+            onKeyDown={(event) => {
+              if (event.key === 'Escape') {
+                event.currentTarget.removeAttribute('open');
+                event.currentTarget.querySelector('summary')?.focus();
+              }
+            }}
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.removeAttribute('open');
+            }}
+          >
+            <summary className={styles.navLink}>
+              Услуги <IconChevronDown size={13} aria-hidden="true" />
+            </summary>
+            <div className={styles.serviceDropdown}>
+              {navigation
+                .filter((item) => ['/services', '/for-home', '/for-business', '/blog'].includes(item.href))
+                .map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={(event) => event.currentTarget.closest('details')?.removeAttribute('open')}
+                  >
+                    {item.href === '/services' ? 'Все услуги' : item.label}
+                  </Link>
+                ))}
+            </div>
+          </details>
+          {navigation
+            .filter((item) => ['/projects', '/about', '/contacts'].includes(item.href))
+            .map((item) => (
+              <Link
+                className={styles.navLink}
+                href={item.href}
+                key={item.href}
+                aria-current={active(item.href) ? 'page' : undefined}
+              >
+                {item.href === '/projects' ? 'Проекты' : item.label}
+              </Link>
+            ))}
         </nav>
 
         <div className={styles.actions}>
           <div className={styles.location}>
-            Кемерово <span>и область</span>
+            <IconMapPin size={19} aria-hidden="true" />
+            <span>
+              Кемерово<small>и Кемеровская область</small>
+            </span>
           </div>
           <Link
             className={styles.phone}
@@ -56,7 +90,10 @@ export default function Header() {
             aria-label={'Позвонить: ' + contactData.phoneLabel}
           >
             <IconPhone size={17} aria-hidden="true" />
-            <span>{contactData.phoneLabel}</span>
+            <span>
+              {contactData.phoneLabel}
+              <small>{settings.hours}</small>
+            </span>
           </Link>
           <Tooltip label="Переключить цветовую тему" withArrow>
             <ActionIcon
@@ -78,7 +115,7 @@ export default function Header() {
             className={styles.headerCta}
             rightSection={<IconArrowUpRight size={17} />}
           >
-            Связаться
+            Оставить заявку
           </Button>
           <Burger
             className={styles.mobileBurger}

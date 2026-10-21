@@ -9,27 +9,20 @@ import {
   IconArrowRight,
   IconArrowUpRight,
   IconBolt,
-  IconBuilding,
   IconCamera,
-  IconCheck,
-  IconHome,
   IconMapPin,
   IconPhone,
   IconSettings,
+  IconShoppingCart,
+  IconTool,
+  IconPlayerPlayFilled,
+  IconChevronRight,
   IconShieldCheck,
   IconSnowflake,
 } from '@tabler/icons-react';
-import {
-  EditableImage as Image,
-  PageText,
-  CmsTitle,
-  useContactData,
-  useCms,
-  ManagedSection,
-  CmsIntro,
-} from '@/app/components/CmsContent';
+import { EditableImage as Image, PageText, useContactData, ManagedSection } from '@/app/components/CmsContent';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { catalogServicePrice } from '@/app/lib/catalog-format';
 import type { ContentItem } from '@/app/lib/cms-types';
 import type { CatalogService } from '@/app/lib/catalog-types';
@@ -37,6 +30,8 @@ import { companyData, contactData } from '@/app/lib/site';
 import { directionCategorySlugs } from '@/app/lib/public-content';
 import type { CatalogCategory } from '@/app/lib/catalog-types';
 import styles from './styles.module.scss';
+import intro from './intro.module.scss';
+import { homeServiceMedia } from '@/app/lib/home-media';
 
 const categories = [
   {
@@ -126,147 +121,121 @@ function SectionHeading({ eyebrow, title, description }: { eyebrow: string; titl
 }
 
 function Hero() {
-  const { settings, media } = useCms();
-  const heroAlt = (hero: string) => media?.[hero.slice(7)]?.alt || 'Современная архитектура и видеонаблюдение';
   return (
-    <section className={styles.hero} id="home" aria-labelledby="hero-title">
-      <div className={`${styles.heroPhoto} ${styles.heroLight}`} role="img" aria-label={heroAlt(settings.heroLight)} />
-      <div className={`${styles.heroPhoto} ${styles.heroDark}`} role="img" aria-label={heroAlt(settings.heroDark)} />
-      <div className={styles.heroInner}>
-        <div className={styles.heroContent}>
-          <span className={styles.heroKicker}>
-            <IconShieldCheck size={17} aria-hidden="true" />
-            <PageText value={'Решения для дома и бизнеса'}>{'Решения для дома и бизнеса'}</PageText>
-          </span>
+    <section className={intro.hero} id="home" aria-labelledby="hero-title">
+      <div className={`${intro.heroPhoto} ${intro.heroLight}`} aria-hidden="true" />
+      <div className={`${intro.heroPhoto} ${intro.heroDark}`} aria-hidden="true" />
+      <div className={intro.heroInner}>
+        <div className={intro.heroContent}>
           <h1 id="hero-title">
-            <CmsTitle value="Системы видеонаблюдения для дома и бизнеса">
-              Системы видеонаблюдения для{' '}
-              <em>
-                <PageText value={'дома и бизнеса'}>{'дома и бизнеса'}</PageText>
-              </em>
-            </CmsTitle>
+            Надёжное <br />
+            видеонаблюдение <br />
+            <em>для дома и бизнеса</em>
           </h1>
-          <p className={styles.heroDescription}>
-            <CmsIntro value="Поможем защитить дом и бизнес, организовать комфортный климат и надёжную электрику. Подберём оборудование, установим и настроим систему под вашу задачу в Кемерово и области." />
+          <p className={intro.heroDescription}>
+            Продажа оборудования, профессиональный монтаж
+            <br className={intro.desktopBreak} /> и обслуживание систем безопасности в Кемерово и области.
           </p>
-          <div className={styles.heroActions}>
-            <Button component={Link} href="/contacts" rightSection={<IconArrowUpRight size={18} />}>
-              <PageText value={'Получить консультацию'}>{'Получить консультацию'}</PageText>
+          <div className={intro.heroActions}>
+            <Button component={Link} href="#request" rightSection={<IconArrowRight size={20} aria-hidden="true" />}>
+              Оставить заявку
             </Button>
-            <Button component={Link} href="/services" variant="default" rightSection={<IconArrowRight size={17} />}>
-              <PageText value={'Смотреть услуги'}>{'Смотреть услуги'}</PageText>
+            <Button
+              component={Link}
+              href="/projects"
+              variant="default"
+              leftSection={<IconPlayerPlayFilled size={17} aria-hidden="true" />}
+            >
+              Смотреть проекты
             </Button>
           </div>
-          <div className={styles.heroHighlights}>
-            <div>
+          <ul className={intro.heroHighlights} aria-label="Продажа, установка и обслуживание">
+            <li>
               <span>
-                <IconHome size={18} />
+                <IconShoppingCart size={25} aria-hidden="true" />
               </span>
-              <strong>
-                <PageText value={'Для дома и бизнеса'}>{'Для дома и бизнеса'}</PageText>
-              </strong>
-            </div>
-            <div>
+              <div>
+                <strong>Продажа</strong>
+                <small>
+                  Современное
+                  <br />
+                  оборудование
+                </small>
+              </div>
+            </li>
+            <li>
               <span>
-                <IconSettings size={18} />
+                <IconSettings size={25} aria-hidden="true" />
               </span>
-              <strong>
-                <PageText value={'Монтаж и настройка'}>{'Монтаж и настройка'}</PageText>
-              </strong>
-            </div>
-            <div>
+              <div>
+                <strong>Установка</strong>
+                <small>
+                  Профессиональный
+                  <br />
+                  монтаж
+                </small>
+              </div>
+            </li>
+            <li>
               <span>
-                <IconMapPin size={18} />
+                <IconTool size={25} aria-hidden="true" />
               </span>
-              <strong>
-                <PageText value={'Кемерово и область'}>{'Кемерово и область'}</PageText>
-              </strong>
-            </div>
-          </div>
-        </div>
-        <div className={styles.heroNote}>
-          <span className={styles.noteIcon}>
-            <IconCamera size={21} aria-hidden="true" />
-          </span>
-          <span>
-            <strong>
-              <PageText value={'Видеонаблюдение'}>{'Видеонаблюдение'}</PageText>
-            </strong>
-            <small>
-              <PageText value={'Решения для разных объектов'}>{'Решения для разных объектов'}</PageText>
-            </small>
-          </span>
-          <span className={styles.noteCheck}>
-            <IconCheck size={17} aria-hidden="true" />
-          </span>
+              <div>
+                <strong>Обслуживание</strong>
+                <small>
+                  Стабильная работа
+                  <br />
+                  вашей системы
+                </small>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
     </section>
   );
 }
 
-function QuickLinks() {
-  const links = [
-    {
-      href: '/for-home',
-      title: 'Для дома',
-      text: 'Решения для жилых объектов',
-      icon: <IconHome size={19} />,
-      image: '/images/media-pack/preview-home.webp',
-      alt: 'Современный частный дом',
-    },
-    {
-      href: '/for-business',
-      title: 'Для бизнеса',
-      text: 'Работы для коммерческих объектов',
-      icon: <IconBuilding size={19} />,
-      image: '/images/media-pack/preview-business.webp',
-      alt: 'Современное коммерческое здание',
-    },
-    {
-      href: '/projects',
-      title: 'Наши работы',
-      text: 'Монтаж и решения для объектов',
-      icon: <IconCamera size={19} />,
-      image: '/images/media-pack/preview-works.webp',
-      alt: 'Камера видеонаблюдения на здании',
-    },
-  ];
-
+function QuickLinks({ catalogCategories }: { catalogCategories: CatalogCategory[] }) {
   return (
-    <ManagedSection
-      title="Популярные разделы"
-      className={styles.quickSection}
-      id="solutions"
-      aria-label="Популярные разделы"
-    >
-      <div className={`${styles.container} ${styles.quickGrid}`}>
-        {links.map((link) => (
-          <Link className={styles.quickCard} href={link.href} key={link.title}>
-            <Image
-              src={link.image}
-              alt={link.alt}
-              fill
-              quality={60}
-              sizes="(max-width: 600px) calc(100vw - 36px), (max-width: 1288px) 31vw, 400px"
+    <section className={intro.quickSection} id="solutions" aria-label="Наши услуги">
+      <div className={`${intro.container} ${intro.quickGrid}`}>
+        {homeServiceMedia.map((item, index) => (
+          <Link
+            className={intro.quickCard}
+            href={
+              catalogCategories.some((category) => category.slug === directionCategorySlugs[index])
+                ? '/services?category=' + directionCategorySlugs[index]
+                : '/services'
+            }
+            key={item.title}
+          >
+            <span
+              className={intro.quickPhoto}
+              aria-hidden="true"
+              style={
+                {
+                  '--service-photo-light': `url("${item.lightSrc}")`,
+                  '--service-photo-dark': `url("${item.src}")`,
+                } as CSSProperties
+              }
             />
-            <span className={styles.quickShade} />
-            <span className={styles.quickBadge}>{link.icon}</span>
-            <span className={styles.quickBody}>
-              <strong>
-                <PageText value={link.title} />
-              </strong>
-              <small>
-                <PageText value={link.text} />
-              </small>
-            </span>
-            <span className={styles.quickArrow}>
-              <IconArrowUpRight size={18} />
-            </span>
+            <span className={intro.quickShade} />
+            <div className={intro.quickBody}>
+              {index === 0 && <span className={intro.quickEyebrow}>Наши услуги</span>}
+              <h2>{item.title}</h2>
+              <p>{item.description}</p>
+              <span className={intro.quickMore}>
+                <span className={intro.quickArrow}>
+                  <IconChevronRight size={21} aria-hidden="true" />
+                </span>
+                Подробнее
+              </span>
+            </div>
           </Link>
         ))}
       </div>
-    </ManagedSection>
+    </section>
   );
 }
 
@@ -610,7 +579,7 @@ export default function Home({
   return (
     <>
       <Hero />
-      <QuickLinks />
+      <QuickLinks catalogCategories={catalogCategories} />
       <Directions catalogCategories={catalogCategories} />
       <PopularServices services={services} />
       <WorkProcess />

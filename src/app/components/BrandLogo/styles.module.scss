@@ -1,20 +1,20 @@
 .logo {
   display: block;
   flex-shrink: 0;
-  width: 220px;
-  aspect-ratio: 3 / 1;
-  background: url('/images/brand/logo-light.webp') center / contain no-repeat;
+  width: 170px;
+  aspect-ratio: 1100 / 505;
+  background: url('/images/home-v2/logo-light.webp') center / contain no-repeat;
 }
 :global(html[data-mantine-color-scheme='dark']) .logo {
-  background-image: url('/images/brand/logo-dark.webp');
+  background-image: url('/images/home-v2/logo-dark-contrast.webp');
 }
 @media (max-width: 560px) {
   .logo {
-    width: 190px;
+    width: 144px;
   }
 }
 @media (max-width: 360px) {
   .logo {
-    width: 160px;
+    width: 130px;
   }
 }
