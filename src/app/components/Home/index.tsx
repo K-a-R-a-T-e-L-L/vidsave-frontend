@@ -1,4 +1,5 @@
 'use client';
+import RobotProcess from '../RobotProcess';
 import FaqSchema from '../FaqSchema';
 
 import FeedbackSection from '../FeedbackSection';
@@ -10,7 +11,6 @@ import {
   IconArrowUpRight,
   IconBolt,
   IconCamera,
-  IconMapPin,
   IconPhone,
   IconSettings,
   IconShoppingCart,
@@ -27,11 +27,13 @@ import { catalogServicePrice } from '@/app/lib/catalog-format';
 import type { ContentItem } from '@/app/lib/cms-types';
 import type { CatalogService } from '@/app/lib/catalog-types';
 import { companyData, contactData } from '@/app/lib/site';
-import { directionCategorySlugs } from '@/app/lib/public-content';
+
 import type { CatalogCategory } from '@/app/lib/catalog-types';
 import styles from './styles.module.scss';
 import intro from './intro.module.scss';
 import { homeServiceMedia } from '@/app/lib/home-media';
+import Artwork from '@/app/components/Artwork';
+import { surveillanceMedia } from '@/app/lib/surveillance-media';
 
 const categories = [
   {
@@ -196,18 +198,14 @@ function Hero() {
   );
 }
 
-function QuickLinks({ catalogCategories }: { catalogCategories: CatalogCategory[] }) {
+function QuickLinks() {
   return (
     <section className={intro.quickSection} id="solutions" aria-label="Наши услуги">
       <div className={`${intro.container} ${intro.quickGrid}`}>
         {homeServiceMedia.map((item, index) => (
           <Link
             className={intro.quickCard}
-            href={
-              catalogCategories.some((category) => category.slug === directionCategorySlugs[index])
-                ? '/services?category=' + directionCategorySlugs[index]
-                : '/services'
-            }
+            href={['/videonablyudenie', '/kondicionery', '/elektromontazh'][index]}
             key={item.title}
           >
             <span
@@ -239,7 +237,7 @@ function QuickLinks({ catalogCategories }: { catalogCategories: CatalogCategory[
   );
 }
 
-function Directions({ catalogCategories }: { catalogCategories: CatalogCategory[] }) {
+function Directions() {
   return (
     <ManagedSection
       title="Всё необходимое для вашего объекта"
@@ -255,11 +253,7 @@ function Directions({ catalogCategories }: { catalogCategories: CatalogCategory[
         <div className={styles.directionGrid}>
           {categories.map((category, index) => (
             <Link
-              href={
-                catalogCategories.some((item) => item.slug === directionCategorySlugs[index])
-                  ? '/services?category=' + directionCategorySlugs[index]
-                  : '/services'
-              }
+              href={['/videonablyudenie', '/kondicionery', '/elektromontazh'][index]}
               className={styles.directionCard}
               key={category.title}
             >
@@ -397,19 +391,22 @@ function WorkProcess() {
           title="Как мы работаем"
           description="Последовательность зависит от задачи и согласованного состава работ."
         />
-        <ol className={styles.processGrid}>
-          {processSteps.map((step) => (
-            <li className={styles.processCard} key={step.number}>
-              <span className={styles.processNumber}>{step.number}</span>
-              <h3>
-                <PageText value={step.title} />
-              </h3>
-              <p>
-                <PageText value={step.text} />
-              </p>
-            </li>
-          ))}
-        </ol>
+        <div className={styles.processLayout}>
+          <RobotProcess />
+          <ol className={styles.processGrid}>
+            {processSteps.map((step) => (
+              <li className={styles.processCard} key={step.number}>
+                <span className={styles.processNumber}>{step.number}</span>
+                <h3>
+                  <PageText value={step.title} />
+                </h3>
+                <p>
+                  <PageText value={step.text} />
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
         <Link className={styles.textLink} href="/about">
           <PageText value={'Подробнее о подходе компании →'}>{'Подробнее о подходе компании →'}</PageText>
         </Link>
@@ -506,21 +503,23 @@ function Geography() {
             Дом, магазин или рабочая площадка — начнём с вашей задачи. Уточним адрес, условия монтажа и возможность
             выезда.
           </p>
+          <p>
+            Работаем в Кемерово, Топках, Берёзовском, Ленинске-Кузнецком, Юрге и Анжеро-Судженске. Это не полный список:
+            возможность, сроки и стоимость выезда в другие населённые пункты обсуждаем по адресу и объёму работ.
+          </p>
           <Link className={styles.textLink} href="#request">
             Обсудить работы по вашему адресу <IconArrowUpRight size={18} />
           </Link>
         </div>
-        <div className={styles.regionDetails}>
-          <span className={styles.regionPin}>
-            <IconMapPin size={32} aria-hidden="true" />
-          </span>
-          <div>
+        <figure className={styles.regionArtwork}>
+          <Artwork src={surveillanceMedia.region} width={1200} height={800} />
+          <figcaption>
             <small>География работ</small>
             <strong>{settings.geography}</strong>
             <p>{settings.address}</p>
             <Link href="/contacts">Контакты и схема проезда →</Link>
-          </div>
-        </div>
+          </figcaption>
+        </figure>
       </div>
     </section>
   );
@@ -567,7 +566,6 @@ function Questions() {
 
 export default function Home({
   services,
-  catalogCategories,
   posts,
   projects,
 }: {
@@ -579,8 +577,8 @@ export default function Home({
   return (
     <>
       <Hero />
-      <QuickLinks catalogCategories={catalogCategories} />
-      <Directions catalogCategories={catalogCategories} />
+      <QuickLinks />
+      <Directions />
       <PopularServices services={services} />
       <WorkProcess />
       <Advantages />

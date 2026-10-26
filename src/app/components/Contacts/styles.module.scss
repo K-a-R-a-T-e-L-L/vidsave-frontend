@@ -147,3 +147,14 @@
     min-height: 340px;
   }
 }
+.embedded {
+  padding: 48px 0;
+  background: transparent;
+}
+.embedded .container {
+  width: 100%;
+}
+.embedded .heading {
+  text-align: left;
+  margin-left: 0;
+}

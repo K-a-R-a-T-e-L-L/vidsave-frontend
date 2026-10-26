@@ -1,4 +1,5 @@
 import JsonLd from '../JsonLd';
+import { ProjectGuide, DirectionLinks, BriefPanel } from '../Editorial';
 import { absoluteUrl } from '@/app/lib/site';
 import { notFound } from 'next/navigation';
 import ContentCard from '../ContentCard';
@@ -31,10 +32,10 @@ export async function ContentListing({
   const path = kind === 'posts' ? '/blog' : '/projects';
   return (
     <PublicPage
-      title={title ?? (kind === 'posts' ? 'Блог' : 'Наши работы')}
+      title={title ?? (kind === 'posts' ? 'Практика: камеры, климат и электрика' : 'Наши работы')}
       description={
         kind === 'posts'
-          ? 'Как выбрать видеонаблюдение, подготовиться к монтажу и обслуживать оборудование. Поможем найти решение для дома или бизнеса.'
+          ? 'Выбор видеонаблюдения, установка и обслуживание кондиционеров, подготовка к электромонтажу. Разборы оборудования и практические материалы для дома и бизнеса.'
           : 'Видеонаблюдение, климат и электрика для жилых и коммерческих объектов. Посмотрите наши работы и обсудите решение для своего объекта.'
       }
       path={category ? `/blog/category/${category}` : path}
@@ -55,11 +56,23 @@ export async function ContentListing({
       )}
       {kind === 'posts' && (
         <>
-          <form action={path} className="content-search">
+          <form action={category ? `/blog/category/${category}` : path} className={styles.search}>
             <label htmlFor="blog-search">Поиск материалов</label>
-            <input id="blog-search" name="search" defaultValue={search} maxLength={200} />
+            <input
+              id="blog-search"
+              type="search"
+              placeholder="Например: запись с камер, чистка кондиционера"
+              name="search"
+              defaultValue={search}
+              maxLength={200}
+            />
             <button type="submit">Найти</button>
+            {search && <Link href={category ? `/blog/category/${category}` : path}>Сбросить</Link>}
           </form>
+          <p role="status">
+            Найдено материалов: {result.total}
+            {search && <> по запросу «{search}»</>}
+          </p>
           <nav aria-label="Категории блога">
             <ul className={styles.filters}>
               <li>
@@ -81,16 +94,18 @@ export async function ContentListing({
               ? 'Материалы не найдены'
               : kind === 'posts'
                 ? 'Нужна помощь с выбором оборудования?'
-                : 'Какое решение подойдёт вашему объекту?'
+                : 'Проекты ещё не опубликованы'
           }
           text={
             search
-              ? 'Попробуйте изменить запрос.'
-              : 'Расскажите, что нужно установить или настроить. Обсудим зоны наблюдения, оборудование и состав работ — и поможем сделать следующий шаг.'
+              ? 'Попробуйте более короткий запрос: камера, кондиционер или кабель. Можно сбросить поиск и посмотреть все опубликованные материалы.'
+              : kind === 'projects'
+                ? 'Здесь появятся фотографии и описание выполненных работ. Пока можно посмотреть направления и обсудить задачу для своего объекта.'
+                : 'Расскажите, что нужно установить или настроить. Обсудим зоны наблюдения, оборудование и состав работ — и поможем сделать следующий шаг.'
           }
         />
       ) : (
-        <PageSection title={kind === 'posts' ? 'Публикации' : 'Наши работы'}>
+        <PageSection title={kind === 'posts' ? 'Публикации' : 'Опубликованные проекты'}>
           <div className={styles.grid}>
             {result.items.map((item) => (
               <ContentCard key={item.id} item={item} kind={kind} />
@@ -116,6 +131,15 @@ export async function ContentListing({
             })}
           </ul>
         </nav>
+      )}
+      {kind === 'projects' && (
+        <>
+          <ProjectGuide />
+          <PageSection title="Какие задачи можно обсудить">
+            <DirectionLinks />
+          </PageSection>
+          <BriefPanel business />
+        </>
       )}
     </PublicPage>
   );

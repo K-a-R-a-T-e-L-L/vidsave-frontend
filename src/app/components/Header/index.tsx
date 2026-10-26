@@ -36,6 +36,13 @@ export default function Header() {
         <nav className={styles.desktopNav} aria-label="Основная навигация">
           <details
             className={styles.serviceMenu}
+            onPointerEnter={(event) => {
+              if (event.pointerType === 'mouse') event.currentTarget.open = true;
+            }}
+            onPointerLeave={(event) => {
+              if (event.pointerType === 'mouse' && !event.currentTarget.contains(document.activeElement))
+                event.currentTarget.open = false;
+            }}
             onKeyDown={(event) => {
               if (event.key === 'Escape') {
                 event.currentTarget.removeAttribute('open');
@@ -51,11 +58,22 @@ export default function Header() {
             </summary>
             <div className={styles.serviceDropdown}>
               {navigation
-                .filter((item) => ['/services', '/for-home', '/for-business', '/blog'].includes(item.href))
+                .filter((item) =>
+                  [
+                    '/videonablyudenie',
+                    '/kondicionery',
+                    '/elektromontazh',
+                    '/services',
+                    '/for-home',
+                    '/for-business',
+                    '/blog',
+                  ].includes(item.href),
+                )
                 .map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
+                    aria-current={active(item.href) ? 'page' : undefined}
                     onClick={(event) => event.currentTarget.closest('details')?.removeAttribute('open')}
                   >
                     {item.href === '/services' ? 'Все услуги' : item.label}

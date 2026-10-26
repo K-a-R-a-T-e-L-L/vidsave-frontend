@@ -14,6 +14,12 @@
   --site-card-shadow: 0 15px 46px rgb(19 58 105 / 7%);
   --site-radius: 24px;
   --site-container: 1240px;
+  --site-h1-size: clamp(38px, 3.65vw, 52px);
+  --site-h1-leading: 1.06;
+  --site-hero-body-size: 16px;
+  --site-hero-button-size: 13px;
+  --site-hero-button-height: 49px;
+  --site-hero-button-padding: 27px;
   scroll-padding-top: 96px;
 }
 
@@ -80,6 +86,40 @@ img {
 :focus-visible {
   outline: 3px solid var(--site-accent);
   outline-offset: 3px;
+}
+.public-site a,
+.public-site button,
+.public-site summary {
+  -webkit-tap-highlight-color: transparent;
+}
+.public-site a,
+.public-site button {
+  transition:
+    color 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+.public-site input,
+.public-site textarea {
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+.public-site input:focus,
+.public-site textarea:focus {
+  border-color: var(--site-accent);
+}
+@media (hover: hover) {
+  .public-site .mantine-Button-root:hover {
+    box-shadow: 0 5px 18px color-mix(in srgb, var(--site-accent) 18%, transparent);
+  }
+  .public-site a:hover {
+    text-decoration-color: currentColor;
+  }
+  .public-site footer a:hover {
+    color: var(--site-accent);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -262,4 +302,57 @@ html[data-mantine-color-scheme='dark'] {
 .mantine-Button-root.admin-danger-button:not([data-variant]) {
   background: var(--site-danger);
   color: var(--site-on-danger);
+}
+
+/* Decorative image hit-testing falls through to links/labels, which remain interactive.
+   Browser-owned image overlays have no universal opt-out. */
+.public-site img {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+.public-site picture {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --site-h1-size: 40px;
+    --site-hero-body-size: 14px;
+  }
+}
+@media (max-width: 600px) {
+  :root {
+    --site-h1-size: clamp(29px, 7.7vw, 44px);
+    --site-h1-leading: 1.1;
+    --site-hero-button-size: 12px;
+    --site-hero-button-padding: 11px;
+  }
+}
+/* Shared service-price rows: keep geometry identical in resting and interactive states. */
+.public-site a[data-catalog-row] {
+  padding-inline: 16px;
+  border-radius: 10px;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+@media (hover: hover) {
+  .public-site a[data-catalog-row]:hover {
+    background-color: var(--site-accent-soft);
+    color: var(--site-accent);
+  }
+}
+.public-site a[data-catalog-row]:focus-visible {
+  background-color: var(--site-accent-soft);
+  outline: 2px solid var(--site-accent);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-site a[data-catalog-row] {
+    transition: none;
+  }
 }

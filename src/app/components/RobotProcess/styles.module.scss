@@ -1,0 +1,198 @@
+.robot {
+  --robot-blue: #409cff;
+  --robot-ink: #28465d;
+  --robot-metal: #eef7ff;
+  width: 100%;
+  max-width: 460px;
+  margin: auto;
+  position: relative;
+}
+:global(html[data-mantine-color-scheme='dark']) .robot {
+  --robot-blue: #398ce3;
+  --robot-ink: #263d50;
+  --robot-metal: #d6e5f1;
+}
+.robot svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+  pointer-events: none;
+  transform: scaleX(-1);
+}
+.robot [data-part='background-simple'] {
+  opacity: 0.1;
+}
+.robot [data-part='Graphics'] {
+  opacity: 0.4;
+}
+.robot [data-joint] {
+  transform-box: view-box;
+  animation-duration: 12s;
+  animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1);
+  animation-iteration-count: infinite;
+}
+.robot [data-joint='shoulder'] {
+  transform-origin: 361px 341px;
+  animation-name: shoulder;
+}
+.robot [data-joint='elbow'] {
+  transform-origin: 268px 289px;
+  animation-name: elbow;
+}
+.robot [data-joint='wrist'] {
+  transform-origin: 310px 159px;
+  animation-name: wrist;
+}
+.robot [data-joint='grip'] {
+  transform-origin: 223px 153px;
+  animation-name: grip;
+}
+.robot[data-active='false'] svg * {
+  animation-play-state: paused !important;
+}
+@keyframes shoulder {
+  0%,
+  12%,
+  100% {
+    transform: rotate(0deg);
+  }
+  32%,
+  49% {
+    transform: rotate(-7deg);
+  }
+  67%,
+  79% {
+    transform: rotate(5deg);
+  }
+  94% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes elbow {
+  0%,
+  12%,
+  100% {
+    transform: rotate(0deg);
+  }
+  32%,
+  49% {
+    transform: rotate(12deg);
+  }
+  67%,
+  79% {
+    transform: rotate(-8deg);
+  }
+  94% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes wrist {
+  0%,
+  12%,
+  100% {
+    transform: rotate(0deg);
+  }
+  32%,
+  49% {
+    transform: rotate(-5deg);
+  }
+  67%,
+  79% {
+    transform: rotate(3deg);
+  }
+  94% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes grip {
+  0%,
+  30%,
+  55%,
+  100% {
+    transform: rotate(0deg);
+  }
+  37%,
+  46% {
+    transform: rotate(6deg);
+  }
+  70%,
+  78% {
+    transform: rotate(-4deg);
+  }
+  94% {
+    transform: rotate(0deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .robot svg * {
+    animation: none !important;
+  }
+}
+
+.robot [data-joint='finger-upper'] {
+  transform-origin: 83px 171px;
+  animation-name: closeUpper;
+}
+.robot [data-joint='finger-lower'] {
+  transform-origin: 159px 218px;
+  animation-name: closeLower;
+}
+@keyframes closeUpper {
+  0%,
+  32%,
+  56%,
+  100% {
+    transform: rotate(0deg);
+  }
+  40%,
+  48% {
+    transform: rotate(-22deg);
+  }
+  72%,
+  80% {
+    transform: rotate(-16deg);
+  }
+}
+@keyframes closeLower {
+  0%,
+  32%,
+  56%,
+  100% {
+    transform: rotate(0deg);
+  }
+  40%,
+  48% {
+    transform: rotate(22deg);
+  }
+  72%,
+  80% {
+    transform: rotate(16deg);
+  }
+}
+:global(html[data-mantine-color-scheme='dark']) .robot [data-part='Graphics'] {
+  opacity: 0.4;
+}
+:global(html[data-mantine-color-scheme='dark']) .robot [data-part='Graphics'] * {
+  stroke: #6e9bc3 !important;
+}
+
+/* Two independent instrument rings rotate around their drawn centres. */
+.robot [data-part='Graphics'] > g:nth-child(2) {
+  transform-box: view-box;
+  transform-origin: 363px 160.8px;
+  animation: instrumentOrbit 38s linear infinite;
+}
+.robot [data-part='Graphics'] > g:nth-child(3) {
+  transform-box: view-box;
+  transform-origin: 138.48px 342.7px;
+  animation: instrumentOrbit 29s linear infinite reverse;
+}
+@keyframes instrumentOrbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+:global(html[data-mantine-color-scheme='dark']) .robot [data-part='background-simple'] {
+  opacity: 0.025;
+}

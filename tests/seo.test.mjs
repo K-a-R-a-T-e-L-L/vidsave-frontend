@@ -57,7 +57,10 @@ test('sitemap has the home page, catalog, and every unique service URL', () => {
   const routes = site.buildSitemapEntries(servicesModule.servicesList);
   const urls = routes.map((entry) => entry.url);
 
-  assert.equal(routes.length, 29);
+  assert.equal(routes.length, 32);
+  assert.ok(urls.includes(`${site.siteConfig.url}/videonablyudenie`));
+  assert.ok(urls.includes(site.siteConfig.url + '/kondicionery'));
+  assert.ok(urls.includes(site.siteConfig.url + '/elektromontazh'));
   assert.equal(new Set(urls).size, urls.length);
   assert.ok(urls.includes(site.siteConfig.url));
   assert.ok(urls.includes(`${site.siteConfig.url}/services`));

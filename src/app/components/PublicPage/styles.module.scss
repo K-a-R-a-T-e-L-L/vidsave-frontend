@@ -27,6 +27,8 @@
   color: var(--site-accent);
 }
 .hero {
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: 1fr;
   gap: 40px;
@@ -34,19 +36,90 @@
   padding: 44px 0 56px;
   border-bottom: 1px solid var(--site-border);
 }
-.hero:has(.heroImage) {
+.hero:has(.heroImage),
+.hero:has(.heroArt) {
   grid-template-columns: 1.2fr 1fr;
+}
+.heroArt {
+  min-width: 0;
+  width: 100%;
+  max-width: 580px;
+  justify-self: center;
+}
+.heroDirections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+.heroDirections a {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--site-border);
+  border-radius: 12px;
+  padding: 12px;
+  color: var(--site-text);
+}
+.heroDirections a:hover,
+.heroDirections a:focus-visible {
+  background: var(--site-accent-soft);
+  border-color: var(--site-accent);
+}
+.search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin: 32px 0 16px;
+}
+.search label {
+  flex-basis: 100%;
+  font-weight: 700;
+}
+.search input {
+  flex: 1 1 280px;
+  width: 100%;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--site-border);
+  border-radius: 12px;
+  background: var(--site-surface);
+  color: var(--site-text);
+}
+.search button {
+  padding: 16px 24px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--site-accent);
+  color: var(--site-on-accent);
+  cursor: pointer;
+}
+.search button:hover {
+  filter: brightness(1.1);
+}
+.search a {
+  padding: 12px;
+  color: var(--site-accent);
+}
+@media (max-width: 960px) {
+  .hero:has(.heroArt) {
+    grid-template-columns: 1fr;
+  }
+  .heroArt {
+    max-width: 420px;
+  }
 }
 .hero h1 {
   margin: 14px 0 20px;
-  font-size: clamp(32px, 4vw, 56px);
-  line-height: 1.13;
+  font-size: var(--site-h1-size);
+  line-height: var(--site-h1-leading);
   letter-spacing: -0.045em;
   overflow-wrap: anywhere;
 }
 .hero p {
   max-width: 780px;
-  font-size: 17px;
+  font-size: var(--site-hero-body-size);
   line-height: 1.85;
   color: var(--site-muted);
 }
@@ -97,12 +170,44 @@
 }
 .card,
 .infoCard {
+  transition:
+    border-color 200ms,
+    box-shadow 200ms,
+    background 200ms;
   min-width: 0;
   background: var(--site-surface);
   border: 1px solid var(--site-border);
   border-radius: var(--site-radius);
   box-shadow: var(--site-card-shadow);
   overflow: hidden;
+}
+.card:focus-within {
+  border-color: var(--site-accent);
+}
+@media (hover: hover) {
+  .card:hover,
+  .infoCard:hover {
+    border-color: var(--site-accent);
+    box-shadow: var(--site-shadow);
+  }
+  .faq summary:hover {
+    color: var(--site-accent);
+  }
+  .faq details:hover {
+    border-color: var(--site-accent);
+  }
+  .filters a:hover {
+    background: var(--site-accent-soft);
+    border-color: var(--site-accent);
+  }
+}
+.faq summary,
+.faq details,
+.filters a {
+  transition:
+    color 180ms,
+    background 180ms,
+    border-color 180ms;
 }
 .infoCard,
 .cardBody {
@@ -315,4 +420,81 @@
 }
 .cta {
   order: 10000;
+}
+.editorial {
+  width: min(calc(100% - 128px), 1280px);
+}
+.editorial .hero {
+  padding: 26px 0 44px;
+  gap: 40px;
+}
+.editorial .hero:has(.heroImage) {
+  grid-template-columns: 1fr 1fr;
+}
+.editorial .hero > div {
+  min-width: 0;
+}
+.editorial .heroImage {
+  height: auto;
+  min-height: 360px;
+  align-self: stretch;
+  border: 1px solid var(--site-border);
+  border-radius: 26px;
+}
+.contentAnchor {
+  scroll-margin-top: 110px;
+}
+@media (max-width: 1100px) {
+  .editorial {
+    width: calc(100% - 64px);
+  }
+}
+@media (max-width: 960px) {
+  .editorial .hero:has(.heroImage) {
+    grid-template-columns: 1fr;
+  }
+  .editorial .heroImage {
+    height: 340px;
+    min-height: 0;
+  }
+}
+@media (max-width: 600px) {
+  .editorial {
+    width: calc(100% - 32px);
+  }
+  .editorial .hero {
+    gap: 26px;
+  }
+  .editorial .heroImage {
+    height: 240px;
+  }
+}
+.catalogList {
+  display: grid;
+}
+.catalogRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 70px;
+  border-bottom: 1px solid var(--site-border);
+  padding: 20px 16px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.catalogRow strong {
+  flex-shrink: 0;
+  color: var(--site-accent);
+  font-size: 13px;
+}
+.catalogRow strong span {
+  margin-left: 16px;
+}
+@media (max-width: 600px) {
+  .catalogRow {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
 }

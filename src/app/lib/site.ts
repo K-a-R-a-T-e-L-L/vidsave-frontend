@@ -45,6 +45,9 @@ export const contactData = {
 } as const;
 
 export const publicNavigation = [
+  { href: '/videonablyudenie', label: 'Видеонаблюдение' },
+  { href: '/kondicionery', label: 'Кондиционеры' },
+  { href: '/elektromontazh', label: 'Электромонтаж' },
   { href: '/services', label: 'Услуги' },
   { href: '/for-home', label: 'Для дома' },
   { href: '/for-business', label: 'Для бизнеса' },
@@ -95,11 +98,13 @@ export const getServiceMetadata = (service: { name: string; description: string;
 export const buildSitemapEntries = (services: Array<{ serviceName: string }>) => [
   { url: siteConfig.url, changeFrequency: 'weekly' as const, priority: 1 },
   { url: absoluteUrl('/services'), changeFrequency: 'monthly' as const, priority: 0.8 },
-  ...['/for-home', '/for-business', '/about', '/contacts'].map((path) => ({
-    url: absoluteUrl(path),
-    changeFrequency: 'monthly' as const,
-    priority: 0.8,
-  })),
+  ...['/videonablyudenie', '/kondicionery', '/elektromontazh', '/for-home', '/for-business', '/about', '/contacts'].map(
+    (path) => ({
+      url: absoluteUrl(path),
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    }),
+  ),
   ...services.map((service) => ({
     url: absoluteUrl(`/services/${service.serviceName}`),
     changeFrequency: 'monthly' as const,

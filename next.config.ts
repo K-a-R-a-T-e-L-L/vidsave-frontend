@@ -2,6 +2,10 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  // Keep unrelated landing styles out of the initial home-page download.
+  experimental: {
+    cssChunking: { type: 'graph', requestCost: 5000 },
+  },
   async headers() {
     return [
       {

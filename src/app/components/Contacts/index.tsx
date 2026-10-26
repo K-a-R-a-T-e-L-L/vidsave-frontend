@@ -5,7 +5,7 @@ import { useContactData } from '@/app/components/CmsContent';
 import Map from '../Map';
 import styles from './styles.module.scss';
 
-export default function Contacts() {
+export default function Contacts({ embedded = false }: { embedded?: boolean }) {
   const { companyData, contactData, settings } = useContactData();
   const contacts = [
     {
@@ -40,7 +40,11 @@ export default function Contacts() {
     },
   ];
   return (
-    <section className={styles.contacts} id="contacts" aria-labelledby="contacts-title">
+    <section
+      className={`${styles.contacts} ${embedded ? styles.embedded : ''}`}
+      id="contacts"
+      aria-labelledby="contacts-title"
+    >
       <div className={styles.container}>
         <div className={styles.heading}>
           <span className={styles.eyebrow}>Контакты</span>

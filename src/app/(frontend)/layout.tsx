@@ -1,3 +1,4 @@
+import PublicInteractions from '@/app/components/PublicInteractions';
 import HeroPreload from '@/app/components/Home/HeroPreload';
 import { brandMetadata } from '@/app/lib/brand-metadata';
 import '@/app/styles/public-mantine';
@@ -72,6 +73,7 @@ export default async function RootLayout({
       <body>
         <ThemeProvider>
           <CmsProvider data={{ ...data, settings: publicSettings }}>
+            <PublicInteractions />
             <YMCounter />
             <SchemaOrg settings={data.settings} />
             {children}

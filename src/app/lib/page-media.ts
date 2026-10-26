@@ -1,20 +1,24 @@
 // Owner-supplied section illustrations.
 export const pageMedia: Record<string, { src: string; alt: string }> = {
+  '/videonablyudenie': {
+    src: '/images/home-v2/surveillance-day-owner.webp',
+    alt: 'Иллюстрация камеры видеонаблюдения у частного дома',
+  },
   '/for-home': {
     src: '/images/media-pack/page-home.webp',
-    alt: 'Частный дом и территория для установки видеонаблюдения',
+    alt: 'Загородный дом с видеонаблюдением, кондиционером и освещением участка',
   },
   '/for-business': {
     src: '/images/media-pack/page-business.webp',
-    alt: 'Коммерческое здание с системой видеонаблюдения',
+    alt: 'Офисно-складской комплекс с камерами, кондиционером и освещением',
   },
   '/services': {
     src: '/images/media-pack/page-services.webp',
-    alt: 'Камера видеонаблюдения на объекте',
+    alt: 'Видеокамера, кондиционер и электрический щит — три направления компании',
   },
   '/projects': {
     src: '/images/media-pack/page-projects.webp',
-    alt: 'Иллюстрация систем видеонаблюдения для раздела работ',
+    alt: 'Чертёж размещения камер, оборудование и монтажный инструмент на рабочем столе',
   },
   '/blog': {
     src: '/images/media-pack/page-blog.webp',

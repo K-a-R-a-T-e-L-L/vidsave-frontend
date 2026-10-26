@@ -170,7 +170,7 @@
 }
 
 .servicesHeading > :global(.mantine-Button-root) {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   margin-bottom: 41px;
   border-color: var(--site-border);
   background: var(--site-surface);
@@ -179,12 +179,9 @@
 
 .filters {
   display: flex;
-  overflow-x: auto;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 0 0 22px;
-  padding-bottom: 5px;
-  scrollbar-width: thin;
-  scrollbar-color: var(--site-accent) var(--site-bg-secondary);
   padding-bottom: 12px;
 }
 
@@ -192,7 +189,10 @@
 .filterActive {
   min-height: 38px;
   flex: 0 0 auto;
-  padding: 0 15px;
+  max-width: 100%;
+  padding: 9px 15px;
+  white-space: normal;
+  overflow-wrap: anywhere;
   border: 1px solid var(--site-border);
   border-radius: 999px;
   background: var(--site-surface);
@@ -425,6 +425,73 @@
 
 .examples {
   background: var(--site-bg);
+}
+.regionArtwork {
+  position: relative;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #031529;
+  border: 1px solid #3986c34d;
+  box-shadow: 0 20px 60px #00224518;
+}
+.regionArtwork picture,
+.regionArtwork img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.regionArtwork figcaption {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 4px 28px 28px;
+  color: #f3f7ff;
+}
+.regionArtwork small {
+  color: #9fcfff;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.regionArtwork strong {
+  font-size: 18px;
+  line-height: 1.5;
+}
+.regionArtwork p {
+  margin: 0;
+  color: #bbd0e8;
+  font-size: 13px;
+}
+.regionArtwork a {
+  color: #82c6ff;
+  font-size: 13px;
+  font-weight: 750;
+}
+.processCard,
+.advantageCard,
+.exampleCard,
+.regionArtwork {
+  transition:
+    border-color 200ms,
+    box-shadow 200ms,
+    background 200ms;
+}
+@media (hover: hover) {
+  .processCard:hover,
+  .advantageCard:hover,
+  .exampleCard:hover {
+    border-color: var(--site-accent);
+    background: var(--site-accent-soft);
+  }
+  .regionArtwork:hover {
+    border-color: #55a7ff;
+    box-shadow: 0 20px 60px #0068bd25;
+  }
+  .accordionControl:hover {
+    background: var(--site-accent-soft);
+  }
 }
 
 .exampleGrid {
@@ -820,17 +887,6 @@
   }
 }
 
-.filters::-webkit-scrollbar {
-  height: 5px;
-}
-.filters::-webkit-scrollbar-track {
-  background: var(--site-bg-secondary);
-  border-radius: 8px;
-}
-.filters::-webkit-scrollbar-thumb {
-  background: var(--site-accent);
-  border-radius: 8px;
-}
 .filterActive {
   color: var(--site-on-accent);
 }
@@ -862,43 +918,6 @@
   line-height: 1.8;
   font-size: 15px;
 }
-.regionDetails {
-  display: flex;
-  gap: 20px;
-  padding: 32px;
-  border-radius: 22px;
-  background: var(--site-bg-secondary);
-}
-.regionPin {
-  flex: 0 0 56px;
-  height: 56px;
-  display: grid;
-  place-items: center;
-  border-radius: 18px;
-  color: var(--site-accent);
-  background: var(--site-icon-surface);
-}
-.regionDetails small {
-  display: block;
-  margin-bottom: 10px;
-  color: var(--site-muted);
-  font-size: 12px;
-}
-.regionDetails strong {
-  display: block;
-  font-size: 19px;
-  line-height: 1.5;
-}
-.regionDetails p {
-  color: var(--site-muted);
-  font-size: 14px;
-  line-height: 1.7;
-}
-.regionDetails a {
-  color: var(--site-accent);
-  font-size: 13px;
-  font-weight: 800;
-}
 @media (max-width: 760px) {
   .region {
     padding: 36px 0;
@@ -909,8 +928,55 @@
     grid-template-columns: 1fr;
     gap: 26px;
   }
-  .regionDetails {
-    padding: 24px;
-    gap: 14px;
+}
+
+:global(html[data-mantine-color-scheme='light']) .regionArtwork {
+  background: radial-gradient(ellipse at 50% 30%, #c6e4ff, #eef6ff 65%);
+  border-color: var(--site-border);
+  figcaption {
+    color: var(--site-text);
+  }
+  small,
+  a {
+    color: var(--site-accent);
+  }
+  p {
+    color: var(--site-muted);
+  }
+  img {
+    filter: brightness(1.15) saturate(0.85);
+    opacity: 0.94;
+  }
+}
+
+.processLayout {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.85fr) minmax(0, 1.4fr);
+  gap: 36px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.processLayout .processGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.processLayout .processCard {
+  min-height: 190px;
+}
+@media (max-width: 900px) {
+  .processLayout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .processLayout > div {
+    max-width: 380px;
+    margin: auto;
+  }
+}
+@media (max-width: 540px) {
+  .processLayout .processGrid {
+    grid-template-columns: 1fr;
+  }
+  .processLayout .processCard {
+    min-height: 0;
   }
 }

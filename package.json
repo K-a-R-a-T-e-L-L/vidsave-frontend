@@ -27,13 +27,11 @@
     "@tiptap/pm": "3.32.0",
     "@tiptap/react": "3.32.0",
     "@tiptap/starter-kit": "3.32.0",
-    "next": "^16.4.0",
+    "next": "16.4.3",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-slick": "^0.31.0",
     "sass": "^1.89.2",
-    "sharp": "0.35.5",
-    "slick-carousel": "^1.8.1"
+    "sharp": "0.35.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -41,10 +39,9 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/react-slick": "^0.23.13",
     "cssnano": "^7.1.1",
     "eslint": "^9.39.5",
-    "eslint-config-next": "^16.4.0",
+    "eslint-config-next": "16.4.3",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-preset-env": "^10.3.0",
     "prettier": "^3.6.2",

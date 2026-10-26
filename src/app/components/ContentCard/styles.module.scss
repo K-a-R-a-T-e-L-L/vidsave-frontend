@@ -14,6 +14,14 @@
   border-color: var(--site-accent);
   transform: translateY(-3px);
 }
+.card:focus-within {
+  border-color: var(--site-accent);
+}
+@media (hover: none) {
+  .card:hover {
+    transform: none;
+  }
+}
 .image {
   position: relative;
   display: block;

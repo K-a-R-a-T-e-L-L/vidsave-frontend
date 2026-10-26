@@ -47,10 +47,10 @@
 }
 .hero h1 {
   margin: 0;
-  font-size: clamp(38px, 3.65vw, 52px);
+  font-size: var(--site-h1-size);
   font-weight: 800;
   letter-spacing: -0.04em;
-  line-height: 1.06;
+  line-height: var(--site-h1-leading);
 }
 .hero h1 em {
   color: #0867b8;
@@ -59,7 +59,7 @@
 .heroDescription {
   margin: 16px 0 0;
   max-width: 555px;
-  font-size: 16px;
+  font-size: var(--site-hero-body-size);
   line-height: 1.55;
   color: #334b65;
 }
@@ -70,10 +70,10 @@
   margin-top: 20px;
 }
 .heroActions :global(.mantine-Button-root) {
-  height: 49px;
-  padding: 0 27px;
+  height: var(--site-hero-button-height);
+  padding: 0 var(--site-hero-button-padding);
   border-radius: 11px;
-  font-size: 13px;
+  font-size: var(--site-hero-button-size);
   font-weight: 700;
 }
 .heroActions :global(.mantine-Button-root:first-child) {
@@ -331,7 +331,7 @@
     max-width: 65%;
   }
   .heroDescription {
-    font-size: 14px;
+    font-size: var(--site-hero-body-size);
   }
   .heroHighlights {
     gap: 12px;
@@ -371,7 +371,7 @@
     max-width: 76%;
   }
   .hero h1 {
-    font-size: 40px;
+    font-size: var(--site-h1-size);
   }
   .heroPhoto {
     background-position:
@@ -413,12 +413,12 @@
     background-image: linear-gradient(0deg, #030d19 0%, transparent 60%), var(--hero-image);
   }
   .hero h1 {
-    font-size: clamp(29px, 7.7vw, 44px);
-    line-height: 1.1;
+    font-size: var(--site-h1-size);
+    line-height: var(--site-h1-leading);
     letter-spacing: -0.035em;
   }
   .heroDescription {
-    font-size: 14px;
+    font-size: var(--site-hero-body-size);
     line-height: 1.6;
     margin-top: 16px;
   }
@@ -431,8 +431,8 @@
   }
   .heroActions :global(.mantine-Button-root) {
     flex: 1;
-    padding: 0 11px;
-    font-size: 12px;
+    padding: 0 var(--site-hero-button-padding);
+    font-size: var(--site-hero-button-size);
   }
   .heroHighlights {
     gap: 12px;

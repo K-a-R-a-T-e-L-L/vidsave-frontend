@@ -1,0 +1,132 @@
+.photo {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  background: center / cover no-repeat var(--photo-light);
+}
+:global([data-mantine-color-scheme='dark']) .photo {
+  background-image: var(--photo-dark);
+}
+.art {
+  width: 100%;
+  color: var(--site-text);
+  --svm-ink: var(--site-muted);
+  --svm-accent: var(--site-accent);
+}
+.art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.crm {
+  --art-paper: #e8f2fc;
+  --art-line: #8ba8bf;
+}
+:global([data-mantine-color-scheme='dark']) .crm {
+  --art-paper: #173957;
+  --art-line: #6387a6;
+}
+.crm :global([id*='background-complete']) {
+  opacity: 0.65;
+}
+.crm :global([id*='Gears'] path) {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: turn 24s linear infinite;
+}
+// Matching contours include their shading copies; both rotate about the same centre.
+.crm :global([id*='Gears'] path[d^='M392.5']),
+.crm :global([id*='Gears'] path[d^='M91.86']) {
+  animation-direction: reverse;
+  animation-duration: 18s;
+}
+.crm :global([id*='path']) {
+  stroke-dasharray: 8 7;
+  animation: flow 12s linear infinite;
+}
+.crm :global([id*='Lines']) {
+  animation: signal 6s ease-in-out infinite;
+}
+.crm :global([id*='Quality']),
+.crm :global([id*='Support']),
+.crm :global([id*='Promotion']),
+.crm :global([id*='Improvement']) {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: node 8s ease-in-out infinite;
+}
+.crm :global([id*='Support']) {
+  animation-delay: -2s;
+}
+.crm :global([id*='Promotion']) {
+  animation-delay: -4s;
+}
+.crm :global([id*='Improvement']) {
+  animation-delay: -6s;
+}
+.pipeline {
+  max-width: 1000px;
+  margin: 32px auto 0;
+}
+.pipeline svg {
+  max-height: 210px;
+}
+.pipeline :global(#svm-deployment-pipeline-line .w) {
+  fill: var(--site-bg);
+}
+.art[data-active='false'] * {
+  animation-play-state: paused !important;
+}
+@keyframes turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes flow {
+  to {
+    stroke-dashoffset: -120;
+  }
+}
+@keyframes signal {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  40%,
+  65% {
+    opacity: 1;
+  }
+}
+@keyframes node {
+  0%,
+  20%,
+  55%,
+  100% {
+    transform: scale(1);
+  }
+  32%,
+  43% {
+    transform: scale(1.035);
+  }
+}
+@media (max-width: 740px) {
+  .photo {
+    background-image: var(--photo-small-light);
+    min-height: 240px;
+  }
+  :global([data-mantine-color-scheme='dark']) .photo {
+    background-image: var(--photo-small-dark);
+  }
+  .pipeline {
+    margin: 24px auto 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .art * {
+    animation: none !important;
+  }
+  .pipeline :global(.st),
+  .pipeline :global(.live) {
+    opacity: 1 !important;
+  }
+}

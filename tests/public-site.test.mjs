@@ -11,7 +11,19 @@ import { pathToFileURL } from 'node:url';
 
 const content = JSON.parse(await readFile('tests/fixtures/content-bootstrap.json', 'utf8'));
 const fixture = JSON.parse((await readFile('tests/fixtures/catalog.json', 'utf8')).replace(/^\uFEFF/, ''));
-const routes = ['/', '/services', '/for-home', '/for-business', '/projects', '/blog', '/about', '/contacts'];
+const routes = [
+  '/',
+  '/services',
+  '/videonablyudenie',
+  '/kondicionery',
+  '/elektromontazh',
+  '/for-home',
+  '/for-business',
+  '/projects',
+  '/blog',
+  '/about',
+  '/contacts',
+];
 const indexable = routes.filter((route) => !['/projects', '/blog'].includes(route));
 const published = fixture.services.map((service) => ({ ...service, status: 'published' }));
 // Never write to the real backend or database. Status filtering is exercised in this fixture.
@@ -357,6 +369,77 @@ test('all sections have one server-rendered H1, distinct metadata and canonical;
   assert.equal(new Set(descriptions).size, indexable.length);
 });
 
+test('surveillance landing uses published video services and handles an empty catalog', async () => {
+  const html = await page('/videonablyudenie');
+  for (const text of [
+    'Вход и калитка',
+    'Въезд и парковка',
+    'Двор и границы участка',
+    'Вход и посетители',
+    'Парковка и разгрузка',
+    'Территория объекта',
+  ]) {
+    assert.ok(html.includes(text), `${text} is available in server HTML before interaction`);
+  }
+  assert.equal((html.match(/name="surveillance-object"/g) || []).length, 2);
+  assert.equal((html.match(/name="(?:home|business)-zone"/g) || []).length, 6);
+  assert.ok(html.includes('Отдельные монтажные работы'));
+  assert.ok(html.includes('/services/ustanovka-ip-kamer'));
+  assert.ok(!html.includes('href="/services/obsluzhivanie-kondicionera"'));
+  assert.ok(!html.includes('href="/services/fixture-hidden"'));
+  const service = jsonLd(html).find((item) => item['@type'] === 'Service');
+  assert.equal(service.provider['@id'], 'https://vidsave.karatell.ru/#business');
+  assert.equal(service.offers, undefined);
+  const statuses = records.map((record) => record.status);
+  try {
+    records.forEach((record) => {
+      record.status = 'hidden';
+    });
+    const empty = await page('/videonablyudenie');
+    assert.ok(!empty.includes('Отдельные монтажные работы'));
+    assert.ok(!empty.includes('href="/services/ustanovka-ip-kamer"'));
+    assert.ok(empty.includes('Обсудить стоимость'));
+    assert.ok(empty.includes('id="request"'));
+  } finally {
+    records.forEach((record, index) => {
+      record.status = statuses[index];
+    });
+  }
+});
+
+test('audience catalog follows publication while object guidance and enquiry stay available', async () => {
+  for (const [route, name] of [
+    ['/for-home', 'home'],
+    ['/for-business', 'business'],
+  ]) {
+    const html = await page(route);
+    assert.equal((html.match(new RegExp(`name="${name}-task"`, 'g')) || []).length, 0);
+    for (const direction of ['/videonablyudenie', '/kondicionery', '/elektromontazh']) {
+      assert.ok(html.includes(`href="${direction}"`));
+    }
+    assert.ok(html.includes('Подходящие услуги из каталога'));
+    assert.ok(html.includes('href="/services/ustanovka-ip-kamer"'));
+    assert.ok(html.includes('data-catalog-row'));
+  }
+  const statuses = records.map((record) => record.status);
+  try {
+    records.forEach((record) => {
+      record.status = 'hidden';
+    });
+    for (const route of ['/for-home', '/for-business']) {
+      const html = await page(route);
+      assert.ok(!html.includes('Подходящие услуги из каталога'));
+      assert.ok(!html.includes('href="/services/ustanovka-ip-kamer"'));
+      assert.ok(html.includes('Подключить оборудование'));
+      assert.ok(html.includes('id="request"'));
+    }
+  } finally {
+    records.forEach((record, index) => {
+      record.status = statuses[index];
+    });
+  }
+});
+
 test('all 23 existing service URLs and prices survive; hidden, draft and unknown slugs return 404', async () => {
   assert.equal(published.length, 23);
   const catalog = await page('/services');
@@ -417,7 +500,7 @@ test('seven category filters work in server HTML and use an unfiltered canonical
 
 test('sitemap, robots and YML retain public semantics and omit empty sections and private routes', async () => {
   const sitemap = await page('/sitemap.xml');
-  assert.equal((sitemap.match(/<url>/g) ?? []).length, 29);
+  assert.equal((sitemap.match(/<url>/g) ?? []).length, 32);
   for (const route of indexable.slice(1)) assert.ok(sitemap.includes(`https://vidsave.karatell.ru${route}<`));
   assert.doesNotMatch(sitemap, /\/blog|\/projects|\/admin|\/api|\?category|fixture-hidden|fixture-draft/);
   const robots = await page('/robots.txt');
@@ -746,7 +829,7 @@ function jsonLd(html) {
   );
 }
 test('FAQ schema matches rendered answers and contact address follows current settings', async () => {
-  for (const route of ['/', '/for-home', '/for-business']) {
+  for (const route of ['/', '/for-home', '/for-business', '/videonablyudenie']) {
     const html = await page(route);
     const faq = jsonLd(html).find((item) => item['@type'] === 'FAQPage');
     assert.ok(faq?.mainEntity.length, route);

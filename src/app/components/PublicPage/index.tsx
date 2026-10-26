@@ -1,3 +1,4 @@
+import { HeroBackdrop, HeroControls } from '@/app/components/LandingPrimitives';
 import JsonLd from '../JsonLd';
 import { pageMedia } from '@/app/lib/page-media';
 import FeedbackSection from '../FeedbackSection';
@@ -11,6 +12,8 @@ import Header from '../Header';
 import Footer from '../Footer';
 import { PageText, CmsTitle, CmsIntro, ManagedSection, EditableImage, EditableFaq } from '@/app/components/CmsContent';
 import styles from './styles.module.scss';
+import { EditorialArt, EditorialPhoto } from '../EditorialMedia';
+import { IconCamera, IconSnowflake, IconBolt } from '@tabler/icons-react';
 
 export type Crumb = { label: string; href: string };
 
@@ -54,14 +57,19 @@ export function PageHero({
   description,
   image,
   imageAlt,
+  actions = false,
+  pagePath,
 }: {
   title: string;
   description: string;
   image?: string;
   imageAlt?: string;
+  actions?: boolean;
+  pagePath?: string;
 }) {
   return (
     <div className={styles.hero}>
+      <HeroBackdrop />
       <div>
         <span className={styles.eyebrow}>ВИДЕОХРАНИТЕЛЬ · Кемерово</span>
         <h1>
@@ -70,17 +78,55 @@ export function PageHero({
         <p>
           <CmsIntro value={description} />
         </p>
+        {actions && <HeroControls secondaryHref="#page-content" />}
+        {pagePath === '/services' && (
+          <nav className={styles.heroDirections} aria-label="Направления услуг">
+            <Link href="/videonablyudenie">
+              <IconCamera size={22} />
+              Видеонаблюдение
+            </Link>
+            <Link href="/kondicionery">
+              <IconSnowflake size={22} />
+              Кондиционеры
+            </Link>
+            <Link href="/elektromontazh">
+              <IconBolt size={22} />
+              Электромонтаж
+            </Link>
+          </nav>
+        )}
       </div>
-      {image && (
-        <div className={styles.heroImage}>
-          <EditableImage
-            src={image}
-            alt={imageAlt ?? title}
-            fill
-            sizes="(max-width: 768px) 90vw, (max-width: 1400px) 40vw, 560px"
-            priority
-          />
+      {pagePath === '/contacts' ? (
+        <div className={styles.heroArt}>
+          <EditorialArt kind="crm" />
         </div>
+      ) : (
+        image && (
+          <div className={styles.heroImage}>
+            {['/for-home', '/for-business', '/services', '/projects'].includes(pagePath ?? '') ? (
+              <EditorialPhoto
+                kind={
+                  pagePath === '/for-home'
+                    ? 'home'
+                    : pagePath === '/for-business'
+                      ? 'business'
+                      : pagePath === '/services'
+                        ? 'services'
+                        : 'projects'
+                }
+                alt={imageAlt ?? title}
+              />
+            ) : (
+              <EditableImage
+                src={image}
+                alt={imageAlt ?? title}
+                fill
+                sizes="(max-width: 768px) 90vw, (max-width: 1400px) 40vw, 560px"
+                priority
+              />
+            )}
+          </div>
+        )
       )}
     </div>
   );
@@ -106,10 +152,11 @@ export function PublicPage({
   afterContent?: ReactNode;
 }) {
   const Content = article ? 'article' : Fragment;
+  const editorial = ['/for-home', '/for-business', '/about', '/projects', '/contacts'].includes(path);
   return (
     <div className="public-site">
       <Header />
-      <main className={styles.main} id="main-content">
+      <main className={`${styles.main} ${editorial ? styles.editorial : ''}`} id="main-content">
         <Breadcrumbs items={crumbs ?? [{ label: title, href: path }]} />
         <Content>
           <PageHero
@@ -117,7 +164,10 @@ export function PublicPage({
             description={description}
             image={pageMedia[path]?.src ?? image}
             imageAlt={pageMedia[path]?.alt}
+            actions={editorial}
+            pagePath={path}
           />
+          {editorial && <div id="page-content" className={styles.contentAnchor} />}
           {children}
         </Content>
         {afterContent}
@@ -171,9 +221,9 @@ export function InfoCards({ items }: { items: { title: string; text: string }[] 
   );
 }
 
-export function ServicePreview({ services }: { services: CatalogService[] }) {
+export function ServicePreview({ services, compact = false }: { services: CatalogService[]; compact?: boolean }) {
   return services.length ? (
-    <div className={styles.grid}>
+    <div className={compact ? styles.catalogList : styles.grid}>
       <JsonLd
         data={{
           '@context': 'https://schema.org',
@@ -186,32 +236,41 @@ export function ServicePreview({ services }: { services: CatalogService[] }) {
           })),
         }}
       />
-      {services.map((service) => (
-        <article className={styles.card} key={service.id}>
-          {service.imagePath && (
-            <Link href={`/services/${service.slug}`} className={styles.cardImage} aria-label={service.name}>
-              <Image
-                src={service.imagePath}
-                quality={75}
-                alt={service.imageAlt || service.name}
-                fill
-                sizes="(max-width: 700px) 90vw, (max-width: 1100px) 45vw, 30vw"
-              />
-            </Link>
-          )}
-          <div className={styles.cardBody}>
-            <span className={styles.eyebrow}>{service.category.name}</span>
-            <h3>
-              <Link href={`/services/${service.slug}`}>{service.name}</Link>
-            </h3>
-            <p>{service.description}</p>
-            <strong>{catalogServicePrice(service)}</strong>
-            <Link className={styles.textLink} href={`/services/${service.slug}`}>
-              Подробнее об услуге →
-            </Link>
-          </div>
-        </article>
-      ))}
+      {services.map((service) =>
+        compact ? (
+          <Link key={service.id} href={`/services/${service.slug}`} data-catalog-row className={styles.catalogRow}>
+            <span>{service.name}</span>
+            <strong>
+              {catalogServicePrice(service)} <span aria-hidden="true">↗</span>
+            </strong>
+          </Link>
+        ) : (
+          <article className={styles.card} key={service.id}>
+            {service.imagePath && (
+              <Link href={`/services/${service.slug}`} className={styles.cardImage} aria-label={service.name}>
+                <Image
+                  src={service.imagePath}
+                  quality={75}
+                  alt={service.imageAlt || service.name}
+                  fill
+                  sizes="(max-width: 700px) 90vw, (max-width: 1100px) 45vw, 30vw"
+                />
+              </Link>
+            )}
+            <div className={styles.cardBody}>
+              <span className={styles.eyebrow}>{service.category.name}</span>
+              <h3>
+                <Link href={`/services/${service.slug}`}>{service.name}</Link>
+              </h3>
+              <p>{service.description}</p>
+              <strong>{catalogServicePrice(service)}</strong>
+              <Link className={styles.textLink} href={`/services/${service.slug}`}>
+                Подробнее об услуге →
+              </Link>
+            </div>
+          </article>
+        ),
+      )}
     </div>
   ) : (
     <p>Не нашли подходящую услугу? Расскажите о своей задаче — подберём необходимые работы для вашего объекта.</p>
