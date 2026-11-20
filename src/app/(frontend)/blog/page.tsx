@@ -8,12 +8,14 @@ export async function generateMetadata({ searchParams }: Props) {
   const query = await searchParams;
   const page = contentPage(query.page);
   const list = await getContentList('posts', 'limit=1');
+  const metadata = await siteMetadata(
+    'Блог о видеонаблюдении и монтаже',
+    'Опубликованные материалы компании о видеонаблюдении, монтаже и обслуживании.',
+    '/blog' + (page > 1 ? '?page=' + page : ''),
+  );
   return {
-    ...(await siteMetadata(
-      'Блог о видеонаблюдении и монтаже',
-      'Опубликованные материалы компании о видеонаблюдении, монтаже и обслуживании.',
-      '/blog' + (page > 1 ? '?page=' + page : ''),
-    )),
+    ...metadata,
+    alternates: { ...metadata.alternates, types: { 'application/rss+xml': '/blog/rss.xml' } },
     robots: { index: list.total > 0 && !query.search, follow: true, 'max-image-preview': 'large' as const },
   };
 }

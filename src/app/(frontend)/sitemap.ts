@@ -13,7 +13,9 @@ const sitemap = async () => {
     allPublishedContent('blog-categories'),
     getCmsBootstrap(),
   ]);
-  const base = buildSitemapEntries(services.map((service) => ({ serviceName: service.slug }))).filter(
+  const base = buildSitemapEntries(
+    services.map((service) => ({ serviceName: service.slug, updatedAt: service.updatedAt })),
+  ).filter(
     (entry) =>
       !bootstrap.pages.some(
         (page) => page.noindex && entry.url === absoluteUrl(page.id === 'home' ? '/' : '/' + page.id),

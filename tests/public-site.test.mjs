@@ -463,7 +463,10 @@ test('all 23 existing service URLs and prices survive; hidden, draft and unknown
     if (service.priceMode === 'fixed') {
       assert.equal(schema.offers.price, service.priceRub);
       assert.equal(schema.offers.priceCurrency, 'RUB');
-    } else assert.equal(schema.offers, undefined, 'A starting price must not be presented as a fixed offer');
+    } else if (service.priceMode === 'from') {
+      assert.equal(schema.offers.price, undefined);
+      assert.equal(schema.offers.priceSpecification.minPrice, service.priceRub);
+    } else assert.equal(schema.offers, undefined);
   }
   for (const slug of ['fixture-hidden', 'fixture-draft', 'not-an-existing-service']) {
     assert.ok(!catalog.includes(`/services/${slug}`));
@@ -498,6 +501,40 @@ test('seven category filters work in server HTML and use an unfiltered canonical
   assert.ok(fallback.includes('Категория не найдена'));
 });
 
+test('a service can be pinned to the homepage without moving it in the catalog', async () => {
+  const item = { ...published[0], id: 'fixture-pinned', slug: 'fixture-pinned', homeOrder: null };
+  records.push(item);
+  try {
+    assert.ok(!(await page('/')).includes('href="/services/fixture-pinned"'));
+    item.homeOrder = 1;
+    assert.ok((await page('/')).includes('href="/services/fixture-pinned"'));
+    assert.ok((await page('/services')).includes('href="/services/fixture-pinned"'));
+  } finally {
+    records.splice(records.indexOf(item), 1);
+  }
+});
+
+test('RSS includes published posts and escapes titles', async () => {
+  const item = {
+    id: 'rss-test',
+    slug: 'rss-test',
+    title: 'RSS <&>',
+    excerpt: 'One & two',
+    status: 'published',
+    publishedAt: '2026-01-01T00:00:00Z',
+  };
+  publicContent.posts.push(item);
+  try {
+    const feed = await page('/blog/rss.xml');
+    assert.ok(feed.includes('<title>RSS &lt;&amp;&gt;</title>'));
+    assert.ok(feed.includes('<link>https://regsave.ru/blog/rss-test</link>'));
+    item.status = 'archived';
+    assert.ok(!(await page('/blog/rss.xml')).includes('rss-test'));
+  } finally {
+    publicContent.posts.splice(publicContent.posts.indexOf(item), 1);
+  }
+});
+
 test('sitemap, robots and YML retain public semantics and omit empty sections and private routes', async () => {
   const sitemap = await page('/sitemap.xml');
   assert.equal((sitemap.match(/<url>/g) ?? []).length, 32);
@@ -514,7 +551,7 @@ test('sitemap, robots and YML retain public semantics and omit empty sections an
   assert.doesNotMatch(feed, /Годы опыта|Конверсия|Рейтинг|Число отзывов/);
   for (const service of published) {
     assert.ok(feed.includes(`<offer id="${service.legacyId}">`));
-    assert.ok(feed.includes(`<price>${service.priceRub}</price>`));
+    assert.ok(feed.includes(`<price${service.priceMode === 'from' ? ' from="true"' : ''}>${service.priceRub}</price>`));
     assert.ok(feed.includes(`/services/${encodeURIComponent(service.slug)}`));
   }
 });
@@ -881,6 +918,9 @@ test('new service schemas use live prices and disappear after withdrawal', async
       if (mode === 'fixed') {
         assert.equal(schema.offers.price, '1250.50');
         assert.equal(schema.offers.priceCurrency, 'RUB');
+      } else if (mode === 'from') {
+        assert.equal(schema.offers.priceSpecification.minPrice, '1250.50');
+        assert.equal(schema.offers.price, undefined);
       } else assert.equal(schema.offers, undefined);
     }
     service.priceMode = 'fixed';

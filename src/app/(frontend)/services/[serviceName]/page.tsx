@@ -36,13 +36,21 @@ export default async function Page({ params }: Props) {
     url: absoluteUrl('/services/' + service.slug),
     areaServed: settings.geography,
     provider: { '@id': siteConfig.url + '/#business' },
-    ...(service.priceMode === 'fixed' && service.priceRub !== null
+    ...(service.priceMode !== 'on_request' && service.priceRub !== null
       ? {
           offers: {
             '@type': 'Offer',
             url: absoluteUrl('/services/' + service.slug),
-            price: service.priceRub,
-            priceCurrency: 'RUB',
+            ...(service.priceMode === 'fixed'
+              ? { price: service.priceRub, priceCurrency: 'RUB' }
+              : {
+                  priceSpecification: {
+                    '@type': 'UnitPriceSpecification',
+                    minPrice: service.priceRub,
+                    priceCurrency: 'RUB',
+                    unitText: service.unitLabel || undefined,
+                  },
+                }),
             ...(service.unitLabel ? { description: service.unitLabel } : {}),
           },
         }

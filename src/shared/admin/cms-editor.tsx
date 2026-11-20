@@ -152,7 +152,7 @@ function initial(resource: Resource): FormData {
             task: '',
             solution: '',
             result: '',
-            sortOrder: 0,
+            sortOrder: resource === 'posts' || resource === 'projects' ? 1000 : 0,
           };
 }
 
@@ -266,6 +266,10 @@ export function CmsEditor({ resource, id }: { resource: Resource; id?: string })
       { name: 'solution', label: 'Выполненное решение', kind: 'area' },
       { name: 'result', label: 'Результат', kind: 'area' },
     ];
+  if (resource === 'posts' || resource === 'projects')
+    fields = [...fields, { name: 'sortOrder', label: 'Порядок в разделе', kind: 'number' }];
+  if (['posts', 'projects', 'services'].includes(resource))
+    fields = [...fields, { name: 'homeOrder', label: 'Позиция на главной', kind: 'number' }];
   if (resource === 'blog-categories') fields = [...fields, { name: 'sortOrder', label: 'Порядок', kind: 'number' }];
   function payload(): FormData {
     const names = fields.map((field) => field.name);
@@ -284,6 +288,7 @@ export function CmsEditor({ resource, id }: { resource: Resource; id?: string })
     for (const name of ['coverId', 'mediaId', 'ogImageId']) if (name in result) result[name] = result[name] || null;
     for (const name of ['seoTitle', 'seoDescription'])
       if (name in result && resource !== 'settings') result[name] = result[name] || null;
+    if ('homeOrder' in result) result.homeOrder = form.homeOrder || null;
     if (resource === 'services' && result.priceMode === 'on_request') result.priceRub = null;
     if ('slug' in result && !result.slug)
       result.slug = contentSlug(String(form.title || form.name || ''), crypto.randomUUID());
@@ -398,9 +403,22 @@ export function CmsEditor({ resource, id }: { resource: Resource; id?: string })
                 <NumberInput
                   key={field.name}
                   {...common}
-                  min={0}
-                  value={Number(form[field.name] ?? 0)}
-                  onChange={(v) => set(field.name, Number(v))}
+                  min={field.name === 'homeOrder' ? 1 : 0}
+                  max={['homeOrder', 'sortOrder'].includes(field.name) ? 100000 : undefined}
+                  allowDecimal={!['homeOrder', 'sortOrder'].includes(field.name)}
+                  description={
+                    field.name === 'homeOrder'
+                      ? '1 — первая карточка. Пусто — автоматический выбор после закреплённых.'
+                      : field.name === 'sortOrder'
+                        ? 'Меньшее число показывается выше.'
+                        : undefined
+                  }
+                  value={
+                    field.name === 'homeOrder'
+                      ? ((form.homeOrder as number | null) ?? '')
+                      : Number(form[field.name] ?? 0)
+                  }
+                  onChange={(v) => set(field.name, field.name === 'homeOrder' && v === '' ? null : Number(v))}
                 />
               ) : field.kind === 'select' ? (
                 <Select

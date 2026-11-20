@@ -116,6 +116,7 @@ export function CmsList({ resource }: { resource: Resource }) {
           'seoDescription',
           'coverId',
           'ogImageId',
+          ...(['posts', 'projects'].includes(resource) ? ['sortOrder', 'homeOrder'] : []),
           ...(resource === 'posts'
             ? ['body', 'categoryIds']
             : resource === 'projects'

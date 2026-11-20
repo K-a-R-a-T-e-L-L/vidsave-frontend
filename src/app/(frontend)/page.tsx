@@ -12,8 +12,8 @@ export default async function Home() {
   const [services, categories, posts, projects] = await Promise.all([
     getPublishedServices(),
     getPublishedCategories(),
-    getContentList('posts', 'limit=3'),
-    getContentList('projects', 'limit=3'),
+    getContentList('posts', 'limit=3&placement=home'),
+    getContentList('projects', 'limit=3&placement=home'),
   ]);
   return (
     <>

@@ -12,7 +12,14 @@
   border: 0;
 }
 
+.canvas iframe,
+.preview {
+  position: absolute;
+  inset: 0;
+}
+
 .canvas {
+  position: relative;
   flex: 1;
   min-height: 0;
 }
@@ -39,11 +46,28 @@
   color: var(--site-accent);
 }
 
+.actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  background: var(--site-surface);
+  border-top: 1px solid var(--site-border);
+}
+.switchMap {
+  background: transparent;
+  color: var(--site-text);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+  border: 0;
+  padding: 10px 14px;
+}
 .route {
   display: block;
   flex: 0 0 auto;
   padding: 10px 14px;
-  border-top: 1px solid var(--site-border);
   background: var(--site-surface);
   color: var(--site-text);
   font-size: 13px;

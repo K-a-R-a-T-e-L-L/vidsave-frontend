@@ -328,7 +328,7 @@ function PopularServices({ services }: { services: CatalogService[] }) {
   const filteredServices = useMemo(() => {
     const selected =
       activeCategory === 'all' ? services : services.filter((service) => service.category.slug === activeCategory);
-    return selected.slice(0, 8);
+    return [...selected].sort((a, b) => (a.homeOrder ?? Infinity) - (b.homeOrder ?? Infinity)).slice(0, 8);
   }, [activeCategory, services]);
 
   return (

@@ -19,6 +19,8 @@ export type CatalogService = {
   priceMode: 'fixed' | 'from' | 'on_request';
   unitLabel: string | null;
   sortOrder: number;
+  homeOrder?: number | null;
+  updatedAt?: string;
   imagePath: string | null;
   imageAlt?: string;
   mediaId?: string | null;

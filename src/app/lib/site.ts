@@ -95,7 +95,7 @@ export const getServiceMetadata = (service: { name: string; description: string;
     `/services/${service.serviceName}`,
   );
 
-export const buildSitemapEntries = (services: Array<{ serviceName: string }>) => [
+export const buildSitemapEntries = (services: Array<{ serviceName: string; updatedAt?: string }>) => [
   { url: siteConfig.url, changeFrequency: 'weekly' as const, priority: 1 },
   { url: absoluteUrl('/services'), changeFrequency: 'monthly' as const, priority: 0.8 },
   ...['/videonablyudenie', '/kondicionery', '/elektromontazh', '/for-home', '/for-business', '/about', '/contacts'].map(
@@ -107,6 +107,7 @@ export const buildSitemapEntries = (services: Array<{ serviceName: string }>) =>
   ),
   ...services.map((service) => ({
     url: absoluteUrl(`/services/${service.serviceName}`),
+    ...(service.updatedAt ? { lastModified: new Date(service.updatedAt) } : {}),
     changeFrequency: 'monthly' as const,
     priority: 0.7,
   })),

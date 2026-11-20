@@ -40,6 +40,7 @@ export default async function Page({ params }: Props) {
     '@type': 'BlogPosting',
     '@id': absoluteUrl(`/blog/${item.slug}#article`),
     headline: item.title,
+    articleSection: item.categories?.map((c) => c.title),
     description: item.excerpt,
     datePublished: item.publishedAt || undefined,
     dateModified: item.updatedAt,

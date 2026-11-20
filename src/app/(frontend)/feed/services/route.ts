@@ -1,17 +1,10 @@
+import { escapeXml } from '@/app/lib/xml';
 import { getPublishedCategories, getPublishedServices } from '@/app/lib/catalog';
 import type { CatalogCategory } from '@/app/lib/catalog-types';
 import { siteConfig } from '@/app/lib/site';
 import { getCmsBootstrap } from '@/app/lib/cms';
 
 export const dynamic = 'force-dynamic';
-
-const escapeXml = (value: string) =>
-  value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
 
 function stableNumericId(uuid: string): number {
   const prefix = Number.parseInt(uuid.replaceAll('-', '').slice(0, 8), 16);
@@ -68,7 +61,7 @@ export async function GET() {
         'Подключение POE коммутатора': 'network_poe_switch',
       };
       const params = `<param name="Регион">${escapeXml(settings.geography)}</param><param name="unit">${unit}</param>${legacyServiceTypes[service.category.name] ? `<param name="service_type">${legacyServiceTypes[service.category.name]}</param>` : ''}`;
-      return `<offer id="${serviceId(service)}"><name>${escapeXml(settings.companyName)}</name><url>${siteConfig.url}/services/${encodeURIComponent(service.slug)}</url><price>${service.priceRub}</price><currencyId>RUB</currencyId><categoryId>${ids.get(service.category.id)}</categoryId><set-ids>set_${serviceId(service)}</set-ids>${image}<description>${escapeXml(service.description.split('.')[0] ?? service.description)}</description><adult>false</adult>${params}</offer>`;
+      return `<offer id="${serviceId(service)}"><name>${escapeXml(settings.companyName)}</name><url>${siteConfig.url}/services/${encodeURIComponent(service.slug)}</url><price${service.priceMode === 'from' ? ' from="true"' : ''}>${service.priceRub}</price><currencyId>RUB</currencyId><categoryId>${ids.get(service.category.id)}</categoryId><set-ids>set_${serviceId(service)}</set-ids>${image}<description>${escapeXml(service.name + '. ' + service.description)}</description><adult>false</adult>${params}</offer>`;
     })
     .join('');
   const categoryXml = categories
