@@ -13,7 +13,7 @@ npm run dev
 
 Public site: `http://localhost:3000`; admin login: `/admin/login`. Production checks: `npm run build`, `npm run start`, or `docker build -t vidsave-frontend .`. The production image builds without a live backend; server-rendered pages require the configured backend at runtime.
 
-The production BFF trusts the canonical site origin by default. An explicit `FRONTEND_ORIGIN` can configure one trusted origin for a local production fixture or a different local port. It must match the backend setting. Canonicals remain `https://vidsave.karatell.ru`.
+The production BFF trusts the canonical site origin by default. An explicit `FRONTEND_ORIGIN` can configure one trusted origin for a local production fixture or a different local port. It must match the backend setting. Canonicals remain `https://regsave.ru`.
 
 ## Content management
 

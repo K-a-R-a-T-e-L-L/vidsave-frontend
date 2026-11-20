@@ -348,7 +348,7 @@ test('all sections have one server-rendered H1, distinct metadata and canonical;
     const html = await page(route);
     assert.equal((html.match(/<h1(?:\s|>)/g) ?? []).length, 1, route);
     const canonical = html.match(/<link rel="canonical" href="([^"]*)"/)?.[1];
-    assert.equal(new URL(canonical).href, `https://vidsave.karatell.ru${route === '/' ? '/' : route}`);
+    assert.equal(new URL(canonical).href, `https://regsave.ru${route === '/' ? '/' : route}`);
     assert.match(html, /<meta property="og:title"/);
     assert.match(html, /<meta name="twitter:card"/);
     for (const target of routes.slice(1)) assert.ok(html.includes(`href="${target}"`), `${route} links to ${target}`);
@@ -388,7 +388,7 @@ test('surveillance landing uses published video services and handles an empty ca
   assert.ok(!html.includes('href="/services/obsluzhivanie-kondicionera"'));
   assert.ok(!html.includes('href="/services/fixture-hidden"'));
   const service = jsonLd(html).find((item) => item['@type'] === 'Service');
-  assert.equal(service.provider['@id'], 'https://vidsave.karatell.ru/#business');
+  assert.equal(service.provider['@id'], 'https://regsave.ru/#business');
   assert.equal(service.offers, undefined);
   const statuses = records.map((record) => record.status);
   try {
@@ -447,7 +447,7 @@ test('all 23 existing service URLs and prices survive; hidden, draft and unknown
     assert.ok(catalog.includes(`/services/${service.slug}`));
     const html = await page(`/services/${service.slug}`);
     assert.equal((html.match(/<h1(?:\s|>)/g) ?? []).length, 1);
-    assert.ok(html.includes(`href="https://vidsave.karatell.ru/services/${service.slug}"`));
+    assert.ok(html.includes(`href="https://regsave.ru/services/${service.slug}"`));
     assert.ok(html.includes(service.imagePath));
     assert.ok(html.includes('Описание услуги'));
     const amount = service.priceRub.split('.')[0].replace(/\B(?=(\d{3})+(?!\d))/g, '\u00a0');
@@ -490,7 +490,7 @@ test('seven category filters work in server HTML and use an unfiltered canonical
   for (const category of fixture.categories) {
     const html = await page(`/services?category=${category.slug}`);
     assert.equal(attribute(html, 'robots'), 'noindex, follow, max-image-preview:large');
-    assert.ok(html.includes('<link rel="canonical" href="https://vidsave.karatell.ru/services"'));
+    assert.ok(html.includes('<link rel="canonical" href="https://regsave.ru/services"'));
     for (const service of published)
       assert.equal(html.includes(`/services/${service.slug}`), service.category.id === category.id);
   }
@@ -501,10 +501,10 @@ test('seven category filters work in server HTML and use an unfiltered canonical
 test('sitemap, robots and YML retain public semantics and omit empty sections and private routes', async () => {
   const sitemap = await page('/sitemap.xml');
   assert.equal((sitemap.match(/<url>/g) ?? []).length, 32);
-  for (const route of indexable.slice(1)) assert.ok(sitemap.includes(`https://vidsave.karatell.ru${route}<`));
+  for (const route of indexable.slice(1)) assert.ok(sitemap.includes(`https://regsave.ru${route}<`));
   assert.doesNotMatch(sitemap, /\/blog|\/projects|\/admin|\/api|\?category|fixture-hidden|fixture-draft/);
   const robots = await page('/robots.txt');
-  assert.match(robots, /Sitemap: https:\/\/vidsave.karatell.ru\/sitemap.xml/);
+  assert.match(robots, /Sitemap: https:\/\/regsave\.ru\/sitemap\.xml/);
   assert.doesNotMatch(robots, /Disallow:\s*\/(blog|projects)/);
   const feed = await page('/feed/services');
   assert.equal((feed.match(/<offer id=/g) ?? []).length, 23);
@@ -875,8 +875,8 @@ test('new service schemas use live prices and disappear after withdrawal', async
       service.priceMode = mode;
       const schema = jsonLd(await page('/services/future-service')).find((item) => item['@type'] === 'Service');
       assert.equal(schema.name, service.name);
-      assert.equal(schema.url, 'https://vidsave.karatell.ru/services/future-service');
-      assert.equal(schema.provider['@id'], 'https://vidsave.karatell.ru/#business');
+      assert.equal(schema.url, 'https://regsave.ru/services/future-service');
+      assert.equal(schema.provider['@id'], 'https://regsave.ru/#business');
       assert.ok(schema.image.startsWith('https://'));
       if (mode === 'fixed') {
         assert.equal(schema.offers.price, '1250.50');
@@ -963,8 +963,8 @@ test('new blog and portfolio schemas follow publication, edits, media and deleti
       assert.equal(schema.headline || schema.name, title);
       assert.equal(schema.datePublished, item.publishedAt);
       assert.equal(schema.dateModified, item.updatedAt);
-      assert.equal(schema.url, 'https://vidsave.karatell.ru' + url);
-      assert.ok(JSON.stringify(schema.image).includes('https://vidsave.karatell.ru/media/'));
+      assert.equal(schema.url, 'https://regsave.ru' + url);
+      assert.ok(JSON.stringify(schema.image).includes('https://regsave.ru/media/'));
       assert.ok(!html.includes('<script>alert(1)</script>'));
       if (kind === 'posts') {
         const article = html.match(/<article>([\s\S]*?)<\/article>/)?.[1];
