@@ -70,7 +70,7 @@ export type CmsBootstrap = {
   settings: Settings;
   pages: CmsPage[];
 };
-export type PublicSettings = Omit<Settings, 'privacyBody' | 'consentBody'>;
+export type PublicSettings = Omit<Settings, 'privacyBody' | 'consentBody' | 'additionalEmail'>;
 export type PublicBootstrap = Omit<CmsBootstrap, 'settings'> & { settings: PublicSettings };
 export type ContentItem = {
   id: string;

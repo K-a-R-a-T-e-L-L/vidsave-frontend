@@ -1,4 +1,5 @@
 'use client';
+import CityLinks from '../CityLinks';
 import BrandLogo from '../BrandLogo';
 import Link from 'next/link';
 import { useContactData } from '@/app/components/CmsContent';
@@ -52,8 +53,8 @@ export default function Footer() {
             <Link className={styles.phone} href={contactData.phoneHref}>
               {contactData.phoneLabel}
             </Link>
-            <Link className={styles.email} href={'mailto:' + contactData.legalEmail}>
-              {contactData.legalEmail}
+            <Link className={styles.email} href={'mailto:' + settings.email}>
+              {settings.email}
             </Link>
           </div>
           <nav className={styles.nav} aria-label="Навигация в подвале">
@@ -70,6 +71,10 @@ export default function Footer() {
               </div>
             ))}
           </nav>
+        </div>
+        <div className={styles.coverage}>
+          <h2>Города выезда</h2>
+          <CityLinks label="Города в подвале" className={styles.cityLinks} />
         </div>
         <div className={styles.bottom}>
           <p>

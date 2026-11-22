@@ -179,16 +179,18 @@ export function PublicPage({
 }
 
 export function PageSection({
+  id,
   title,
   description,
   children,
 }: {
+  id?: string;
   title: string;
   description?: string;
   children?: ReactNode;
 }) {
   return (
-    <ManagedSection className={styles.section} title={title}>
+    <ManagedSection id={id} className={styles.section} title={title}>
       <div className={styles.heading}>
         <h2>
           <PageText value={title} />

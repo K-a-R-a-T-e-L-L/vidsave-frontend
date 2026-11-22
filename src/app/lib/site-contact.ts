@@ -22,7 +22,6 @@ export function contactValues(s: PublicSettings) {
       phoneHref: phoneHref(s.phone),
       additionalPhone: s.additionalPhone,
       additionalPhoneHref: phoneHref(s.additionalPhone),
-      legalEmail: s.additionalEmail,
       addressLabel: s.address,
       mapAddress: s.address,
       legalName: s.legalName,

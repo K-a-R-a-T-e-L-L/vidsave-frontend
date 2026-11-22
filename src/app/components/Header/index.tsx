@@ -3,15 +3,82 @@
 import { ActionIcon, Burger, Button, Drawer, Tooltip } from '@mantine/core';
 import { useComputedColorScheme, useMantineColorScheme } from '@mantine/core';
 import { IconArrowUpRight, IconMoon, IconPhone, IconSun, IconMapPin, IconChevronDown } from '@tabler/icons-react';
+import CityLinks from '../CityLinks';
 import BrandLogo from '../BrandLogo';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useContactData } from '@/app/components/CmsContent';
 import { publicNavigation } from '@/app/lib/site';
 import styles from './styles.module.scss';
 
 const navigation = publicNavigation;
+
+function DesktopMenu({
+  className,
+  triggerClassName,
+  trigger,
+  children,
+}: {
+  className: string;
+  triggerClassName: string;
+  trigger: ReactNode;
+  children: ReactNode;
+}) {
+  const menu = useRef<HTMLDetailsElement>(null);
+  const mousePressed = useRef(false);
+  useEffect(() => {
+    const closeOnEscape = (event: KeyboardEvent) => {
+      const details = menu.current;
+      if (event.key !== 'Escape' || !details?.open) return;
+      if (details.contains(document.activeElement)) details.querySelector('summary')?.focus();
+      details.open = false;
+    };
+    const closeOnOutsidePress = (event: PointerEvent) => {
+      const details = menu.current;
+      if (details?.open && !details.contains(event.target as Node)) details.open = false;
+    };
+    document.addEventListener('keydown', closeOnEscape);
+    document.addEventListener('pointerdown', closeOnOutsidePress);
+    return () => {
+      document.removeEventListener('keydown', closeOnEscape);
+      document.removeEventListener('pointerdown', closeOnOutsidePress);
+    };
+  }, []);
+  return (
+    <details
+      ref={menu}
+      name="header-navigation"
+      className={className}
+      onPointerEnter={(event) => {
+        if (event.pointerType === 'mouse') event.currentTarget.open = true;
+      }}
+      onPointerLeave={(event) => {
+        if (event.pointerType === 'mouse' && !event.currentTarget.querySelector(':focus-visible'))
+          event.currentTarget.open = false;
+      }}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.open = false;
+      }}
+      onClick={(event) => {
+        if ((event.target as Element).closest('a')) event.currentTarget.open = false;
+      }}
+    >
+      <summary
+        className={triggerClassName}
+        onPointerDown={(event) => {
+          mousePressed.current = event.pointerType === 'mouse';
+        }}
+        onClick={(event) => {
+          if (event.detail && mousePressed.current && menu.current?.open) event.preventDefault();
+        }}
+      >
+        {trigger}
+      </summary>
+      {children}
+    </details>
+  );
+}
 
 export default function Header() {
   const { contactData, settings } = useContactData();
@@ -34,28 +101,15 @@ export default function Header() {
         </Link>
 
         <nav className={styles.desktopNav} aria-label="Основная навигация">
-          <details
+          <DesktopMenu
             className={styles.serviceMenu}
-            onPointerEnter={(event) => {
-              if (event.pointerType === 'mouse') event.currentTarget.open = true;
-            }}
-            onPointerLeave={(event) => {
-              if (event.pointerType === 'mouse' && !event.currentTarget.contains(document.activeElement))
-                event.currentTarget.open = false;
-            }}
-            onKeyDown={(event) => {
-              if (event.key === 'Escape') {
-                event.currentTarget.removeAttribute('open');
-                event.currentTarget.querySelector('summary')?.focus();
-              }
-            }}
-            onBlur={(event) => {
-              if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.removeAttribute('open');
-            }}
+            triggerClassName={styles.navLink}
+            trigger={
+              <>
+                Услуги <IconChevronDown size={13} aria-hidden="true" />
+              </>
+            }
           >
-            <summary className={styles.navLink}>
-              Услуги <IconChevronDown size={13} aria-hidden="true" />
-            </summary>
             <div className={styles.serviceDropdown}>
               {navigation
                 .filter((item) =>
@@ -70,17 +124,12 @@ export default function Header() {
                   ].includes(item.href),
                 )
                 .map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    aria-current={active(item.href) ? 'page' : undefined}
-                    onClick={(event) => event.currentTarget.closest('details')?.removeAttribute('open')}
-                  >
+                  <Link key={item.href} href={item.href} aria-current={active(item.href) ? 'page' : undefined}>
                     {item.href === '/services' ? 'Все услуги' : item.label}
                   </Link>
                 ))}
             </div>
-          </details>
+          </DesktopMenu>
           {navigation
             .filter((item) => ['/projects', '/about', '/contacts'].includes(item.href))
             .map((item) => (
@@ -96,12 +145,21 @@ export default function Header() {
         </nav>
 
         <div className={styles.actions}>
-          <div className={styles.location}>
-            <IconMapPin size={19} aria-hidden="true" />
-            <span>
-              Кемерово<small>и Кемеровская область</small>
-            </span>
-          </div>
+          <DesktopMenu
+            className={styles.cityMenu}
+            triggerClassName={styles.location}
+            trigger={
+              <>
+                <IconMapPin size={19} aria-hidden="true" />
+                <span>
+                  Города выезда<small>Кемеровская область</small>
+                </span>
+                <IconChevronDown size={13} aria-hidden="true" />
+              </>
+            }
+          >
+            <CityLinks label="Города в шапке" className={styles.cityDropdown} />
+          </DesktopMenu>
           <Link
             className={styles.phone}
             href={contactData.phoneHref}
@@ -156,6 +214,19 @@ export default function Header() {
         classNames={{ content: styles.drawerContent, header: styles.drawerHeader, body: styles.drawerBody }}
       >
         <nav className={styles.mobileNav} aria-label="Мобильная навигация">
+          <details
+            className={styles.mobileCities}
+            onClick={(event) => {
+              if ((event.target as Element).closest('a')) closeMenu();
+            }}
+          >
+            <summary>
+              <IconMapPin size={18} aria-hidden="true" />
+              Города выезда
+              <IconChevronDown size={15} aria-hidden="true" />
+            </summary>
+            <CityLinks label="Города в мобильном меню" className={styles.mobileCityLinks} />
+          </details>
           {navigation.map((item) => (
             <Link
               href={item.href}

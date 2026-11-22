@@ -61,9 +61,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const data = await getCmsBootstrap();
-  const { privacyBody, consentBody, ...publicSettings } = data.settings;
+  const { privacyBody, consentBody, additionalEmail, ...publicSettings } = data.settings;
   void privacyBody;
   void consentBody;
+  void additionalEmail;
   return (
     <html lang="ru" {...mantineHtmlProps} className={`${manropeCyrillic.variable} ${manropeLatin.variable}`}>
       <head>

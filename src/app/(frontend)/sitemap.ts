@@ -2,6 +2,7 @@ import { allPublishedContent, getCmsBootstrap } from '@/app/lib/cms';
 import { absoluteUrl } from '@/app/lib/site';
 import { buildSitemapEntries } from '@/app/lib/site';
 import { getPublishedServices } from '@/app/lib/catalog';
+import { cityPath, serviceCities } from '@/app/lib/service-area';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,6 +24,7 @@ const sitemap = async () => {
   );
   return [
     ...base,
+    ...serviceCities.map(({ slug }) => ({ url: absoluteUrl(cityPath(slug)) })),
     ...(posts.length ? [{ url: absoluteUrl('/blog') }] : []),
     ...(projects.length ? [{ url: absoluteUrl('/projects') }] : []),
     ...posts.map((post) => ({ url: absoluteUrl('/blog/' + post.slug), lastModified: new Date(post.updatedAt) })),

@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import type { CmsBootstrap, ContentItem, ContentList } from './cms-types';
-import { createPageMetadata } from './site';
+import { absoluteUrl, createPageMetadata } from './site';
 
 export class ContentUnavailable extends Error {
   constructor() {
@@ -47,14 +47,28 @@ export const getContentDetail = cache(async (kind: 'posts' | 'projects' | 'blog-
   if (!response.ok) throw new ContentUnavailable();
   return (await response.json()) as ContentItem;
 });
-export async function siteMetadata(title: string, description: string, path: string): Promise<Metadata> {
+export async function siteMetadata(
+  title: string,
+  description: string,
+  path: string,
+  preview?: { url: string; alt: string },
+): Promise<Metadata> {
   const { settings } = await getCmsBootstrap();
   const metadata = createPageMetadata(title, description, path);
-  const brandTitle = title + ' | «' + settings.companyName + '»';
+  const brandTitle = title.toLocaleLowerCase('ru').includes(settings.companyName.toLocaleLowerCase('ru'))
+    ? title
+    : title + ' | «' + settings.companyName + '»';
+  const image = preview && absoluteUrl(preview.url);
   return {
     ...metadata,
-    openGraph: { ...metadata.openGraph, title: brandTitle, siteName: settings.companyName },
-    twitter: { ...metadata.twitter, title: brandTitle },
+    title: { absolute: brandTitle },
+    openGraph: {
+      ...metadata.openGraph,
+      title: brandTitle,
+      siteName: settings.companyName,
+      ...(image && { images: [{ url: image, alt: preview?.alt }] }),
+    },
+    twitter: { ...metadata.twitter, title: brandTitle, ...(image && { images: [image] }) },
   };
 }
 export async function cmsPageMetadata(id: string, fallbackTitle: string, fallbackDescription: string, path: string) {

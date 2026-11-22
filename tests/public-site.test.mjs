@@ -535,9 +535,31 @@ test('RSS includes published posts and escapes titles', async () => {
   }
 });
 
+test('city landings resolve published prices and order options on all ten canonical URLs', async () => {
+  const cityUrls = [
+    ...(await page('/sitemap.xml')).matchAll(/<loc>(https:\/\/regsave\.ru\/goroda\/[^<]+)<\/loc>/g),
+  ].map((match) => new URL(match[1]));
+  assert.equal(cityUrls.length, 10);
+  const headings = new Set();
+  for (const url of cityUrls) {
+    const html = await page(url.pathname);
+    const heading = html.match(/<h1[^>]*>([^<]+)<\/h1>/)?.[1];
+    assert.ok(heading);
+    headings.add(heading);
+    assert.ok(html.includes(`rel="canonical" href="${url.href}"`));
+    assert.equal((html.match(/data-catalog-row=/g) ?? []).length, 9);
+    assert.ok(html.includes('Купить кондиционер с установкой'));
+    assert.ok(html.includes('Установить свой кондиционер'));
+    assert.ok(html.includes('href="/projects"'));
+  }
+  assert.equal(headings.size, 10);
+  await page('/goroda/unknown-city', 404);
+});
+
 test('sitemap, robots and YML retain public semantics and omit empty sections and private routes', async () => {
   const sitemap = await page('/sitemap.xml');
-  assert.equal((sitemap.match(/<url>/g) ?? []).length, 32);
+  assert.equal((sitemap.match(/<url>/g) ?? []).length, 42);
+  assert.equal((sitemap.match(/<loc>https:\/\/regsave\.ru\/goroda\//g) ?? []).length, 10);
   for (const route of indexable.slice(1)) assert.ok(sitemap.includes(`https://regsave.ru${route}<`));
   assert.doesNotMatch(sitemap, /\/blog|\/projects|\/admin|\/api|\?category|fixture-hidden|fixture-draft/);
   const robots = await page('/robots.txt');
@@ -1146,13 +1168,19 @@ test(
             }),
           );
           if (width === 1280) {
-            await page.locator('header summary').click();
+            const services = page.locator('header summary').filter({ hasText: 'Услуги' });
+            const cities = page.locator('header summary').filter({ hasText: 'Города выезда' });
+            await services.hover();
+            await page.locator('header details[open] a[href="/for-home"]').waitFor();
+            await cities.hover();
+            await page.locator('header details[open] a[href="/goroda/topki"]').waitFor();
+            assert.equal(await page.locator('header details[open]').count(), 1);
             await page.keyboard.press('Escape');
-            assert.equal(await page.locator('header details').getAttribute('open'), null);
-            await page.locator('header summary').click();
-            await page.getByRole('link', { name: 'Для дома', exact: true }).first().click();
+            assert.equal(await page.locator('header details[open]').count(), 0);
+            await services.hover();
+            await page.locator('header details[open] a[href="/for-home"]').click();
             await page.waitForURL(origin + '/for-home');
-            assert.equal(await page.locator('header details').getAttribute('open'), null);
+            assert.equal(await page.locator('header details[open]').count(), 0);
             await page.goto(origin + '/', { waitUntil: 'networkidle' });
           } else {
             await page.getByRole('button', { name: 'Открыть меню', exact: true }).click();

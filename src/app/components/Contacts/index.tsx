@@ -76,7 +76,7 @@ export default function Contacts({ embedded = false }: { embedded?: boolean }) {
               <span>{contactData.addressLabel}</span>
             </div>
           </div>
-          <div className={styles.map}>
+          <div id="karta" className={styles.map}>
             <Map
               latitude={companyData.latitude}
               longitude={companyData.longitude}

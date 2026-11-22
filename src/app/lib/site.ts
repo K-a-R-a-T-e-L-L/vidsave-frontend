@@ -35,7 +35,6 @@ export const contactData = {
   phoneHref: `tel:${companyData.telephone.replaceAll('-', '')}`,
   additionalPhone: '8-995-065-67-77',
   additionalPhoneHref: 'tel:+79950656777',
-  legalEmail: 'denis.zaichuk@yandex.ru',
   addressLabel: 'Россия, г. Кемерово, ул. Шестакова, д. 6А',
   mapAddress: 'Кемерово, Шестакова 6А',
   legalName: 'ИП Зайчук Денис Евгеньевич',

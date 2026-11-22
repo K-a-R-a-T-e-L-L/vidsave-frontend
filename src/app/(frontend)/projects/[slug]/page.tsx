@@ -9,21 +9,13 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
   const item = await getContentDetail('projects', slug);
-  const metadata = await siteMetadata(
+  const image = item.ogImageUrl || item.coverUrl;
+  return siteMetadata(
     item.seoTitle || item.title,
     item.seoDescription || toMetaDescription(item.excerpt),
     `/projects/${item.slug}`,
+    image ? { url: image, alt: item.coverAlt || item.title } : undefined,
   );
-  return {
-    ...metadata,
-    openGraph: {
-      ...metadata.openGraph,
-      images:
-        item.ogImageUrl || item.coverUrl
-          ? [{ url: absoluteUrl(item.ogImageUrl || item.coverUrl!) }]
-          : metadata.openGraph?.images,
-    },
-  };
 }
 export default async function Page({ params }: Props) {
   const { slug } = await params;

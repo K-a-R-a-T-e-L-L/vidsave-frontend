@@ -285,53 +285,77 @@
 }
 .contactDetails {
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: 48px;
-  padding: 32px;
-  background: var(--site-bg-secondary);
-  border: 1px solid var(--site-border);
-  border-radius: 24px;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: start;
 }
-.contactDetails p {
-  font-size: 14px;
+.contactDetails h3 {
+  margin: 0 0 14px;
+  font-size: clamp(20px, 2vw, 25px);
+  letter-spacing: -0.035em;
+  line-height: 1.25;
+}
+.organisation {
+  padding: clamp(20px, 2.4vw, 32px);
+  border-radius: 20px;
+  background: var(--site-bg-secondary);
+}
+.organisation p {
+  margin: 14px 0 0;
   color: var(--site-muted);
-  line-height: 1.7;
+  font-size: 14px;
+  line-height: 1.6;
 }
 .contactLink {
-  display: block;
-  padding: 14px 12px;
-  margin-top: 8px;
-  color: var(--site-accent);
-  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 6px 0;
+  font-weight: 650;
   overflow-wrap: anywhere;
-  transition: background 0.2s;
+}
+.contactLink svg {
+  color: var(--site-accent);
+  flex: none;
 }
 .contactLink:hover,
 .contactLink:focus-visible {
-  background: var(--site-accent-soft);
+  color: var(--site-accent);
+}
+.legal {
+  padding-top: 4px;
 }
 .requisites {
   margin: 0;
 }
 .requisites > div {
-  padding: 14px 0;
-  border-bottom: 1px solid var(--site-border);
+  display: grid;
+  grid-template-columns: minmax(105px, 0.5fr) 1fr;
+  gap: 6px 16px;
+  padding: 10px 0;
+  border-top: 1px solid var(--site-border);
+  align-items: baseline;
 }
 .requisites dt {
   color: var(--site-muted);
-  font-size: 12px;
-  margin-bottom: 6px;
+  font-size: 14px;
 }
 .requisites dd {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.5;
   overflow-wrap: anywhere;
 }
-@media (max-width: 700px) {
+@media (max-width: 760px) {
   .contactDetails {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 420px) {
+  .requisites > div {
     grid-template-columns: 1fr;
-    padding: 22px;
-    gap: 24px;
+    gap: 2px;
   }
 }

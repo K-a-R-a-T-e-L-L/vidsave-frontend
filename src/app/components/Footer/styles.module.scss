@@ -48,7 +48,8 @@
   grid-template-columns: 1.1fr 1fr 0.8fr 1.1fr;
   gap: 28px;
 }
-.group h2 {
+.group h2,
+.coverage h2 {
   font-size: 12px !important;
   line-height: 1.5;
   letter-spacing: 0.035em;
@@ -132,4 +133,26 @@
     align-items: flex-start;
     gap: 14px;
   }
+}
+
+.coverage {
+  border-top: 1px solid var(--site-border);
+  padding: 20px 0;
+  display: flex;
+  align-items: baseline;
+  gap: 12px 32px;
+  flex-wrap: wrap;
+}
+.coverage h2 {
+  margin: 0;
+}
+.cityLinks {
+  display: flex;
+  gap: 2px 20px;
+  flex-wrap: wrap;
+}
+.cityLinks a {
+  padding: 5px 0;
+  color: var(--site-muted);
+  font-size: 13px;
 }

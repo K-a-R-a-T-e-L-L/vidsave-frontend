@@ -1,0 +1,393 @@
+.main {
+  width: min(calc(100% - 128px), 1280px);
+  margin-inline: auto;
+  padding: 28px 0 68px;
+  color: var(--site-text);
+}
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(28px, 3.5vw, 54px);
+  padding: 26px 0 44px;
+}
+.location {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--site-accent);
+  font-weight: 750;
+  font-size: 0.84rem;
+}
+.hero h1 {
+  font-size: clamp(2.15rem, 3.6vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  margin: 16px 0;
+  overflow-wrap: break-word;
+}
+.hero p,
+.section p,
+.climate p,
+.visit p {
+  color: var(--site-muted);
+  line-height: 1.65;
+  margin: 0 0 18px;
+}
+.hero p {
+  font-size: var(--site-hero-body-size);
+  max-width: 56ch;
+}
+.photo {
+  position: relative;
+  min-height: 350px;
+  align-self: stretch;
+  overflow: hidden;
+  border-radius: 26px;
+}
+.photo img,
+.thumb img {
+  object-fit: cover;
+}
+.nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 1.8vw, 24px);
+  padding: 24px 0 0;
+  border-top: 1px solid var(--site-border);
+}
+.nav a {
+  position: relative;
+  display: grid;
+  align-items: end;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #142636;
+  color: #fff;
+  aspect-ratio: 2.45;
+}
+.thumb,
+.thumb::after {
+  position: absolute;
+  inset: 0;
+}
+.thumb {
+  z-index: -1;
+}
+.thumb::after {
+  content: '';
+  background: linear-gradient(0deg, rgb(6 17 34 / 88%), rgb(6 17 34 / 35%) 45%, transparent 85%);
+}
+.thumb img {
+  transition: transform 240ms ease;
+}
+.navLabel {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: clamp(12px, 1.5vw, 22px);
+  font-weight: 750;
+  font-size: clamp(0.95rem, 1.5vw, 1.35rem);
+}
+.navLabel svg {
+  width: 1.1em;
+  height: 1.1em;
+  flex: none;
+}
+.navLabel svg:last-child {
+  margin-left: auto;
+}
+.section {
+  padding: clamp(42px, 5.5vw, 82px) 0;
+}
+.split,
+.climateGrid,
+.climatePrices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: clamp(28px, 4vw, 64px);
+}
+.section h2,
+.climate h2,
+.visit h2 {
+  font-size: clamp(1.75rem, 3vw, 2.65rem);
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+  margin: 0 0 14px;
+  overflow-wrap: break-word;
+}
+.section h3,
+.climate h3 {
+  font-size: 1.16rem;
+  line-height: 1.35;
+  margin: 0 0 8px;
+}
+.section p {
+  max-width: 60ch;
+}
+.scene,
+.climateScene {
+  overflow: hidden;
+  border-radius: var(--site-radius);
+  background: var(--site-bg-secondary);
+}
+.scene {
+  aspect-ratio: 4/3;
+  display: grid;
+  align-items: center;
+}
+.scene picture,
+.climateScene picture,
+.visit picture {
+  display: block;
+}
+.scene img,
+.climateScene img,
+.visit img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-top: 18px;
+}
+.links a,
+.visit a,
+.climatePrices a:not([data-catalog-row]) {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--site-accent);
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+.action {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: start;
+  border-radius: 11px;
+  padding: 12px 16px;
+  background: var(--site-accent-soft);
+  color: var(--site-accent);
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+.split [data-catalog-row],
+.climatePrices [data-catalog-row] {
+  min-height: 50px;
+  padding: 12px 0;
+  gap: 12px;
+}
+.climate {
+  padding: clamp(20px, 3vw, 42px);
+  border-radius: var(--site-radius);
+  background: var(--site-bg-secondary);
+}
+.climate h2 {
+  margin-bottom: 24px;
+}
+.climateScene {
+  min-width: 0;
+  background: var(--site-surface);
+}
+.options {
+  display: grid;
+  gap: 18px;
+}
+.options article {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 14px;
+  align-items: start;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--site-border);
+}
+.options article:last-child {
+  border: 0;
+  padding-bottom: 0;
+}
+.options article > :not(svg) {
+  grid-column: 2;
+}
+.optionIcon {
+  color: var(--site-accent);
+  width: 27px;
+  height: 27px;
+}
+.options .action {
+  justify-self: start;
+  background: var(--site-surface);
+}
+.climatePrices {
+  margin-top: 26px;
+  padding-top: 20px;
+  border-top: 1px solid var(--site-border);
+}
+.visit {
+  display: grid;
+  grid-template-columns: minmax(100px, 170px) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(14px, 2.6vw, 38px);
+  padding: 20px clamp(18px, 3vw, 42px);
+  border-block: 1px solid var(--site-border);
+}
+.visit p:last-child {
+  margin: 0;
+}
+.visit > a {
+  white-space: nowrap;
+}
+@media (hover: hover) {
+  .nav a:hover .thumb img {
+    transform: scale(1.04);
+  }
+  .links a:not(.action):hover,
+  .visit a:hover,
+  .climatePrices a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .action:hover {
+    box-shadow: inset 0 0 0 1px var(--site-accent);
+  }
+}
+@media (max-width: 1100px) {
+  .main {
+    width: calc(100% - 64px);
+  }
+}
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .photo {
+    min-height: 0;
+    height: clamp(220px, 38vw, 350px);
+  }
+  .hero h1 {
+    max-width: 22ch;
+  }
+  .split,
+  .climateGrid,
+  .climatePrices {
+    gap: 24px;
+  }
+  .visit {
+    grid-template-columns: 110px 1fr;
+  }
+  .visit > a {
+    grid-column: 2;
+  }
+}
+@media (max-width: 680px) {
+  .main {
+    width: calc(100% - 32px);
+    padding: 18px 0 42px;
+  }
+  .hero {
+    padding: 18px 0 24px;
+    gap: 14px;
+  }
+  .heroCopy {
+    display: contents;
+  }
+  .heroCopy > * {
+    order: 2;
+  }
+  .heroCopy > .location,
+  .heroCopy > h1 {
+    order: 0;
+    margin: 0;
+  }
+  .heroCopy > p,
+  .heroCopy > div:has(a) {
+    margin: 0;
+  }
+  .photo {
+    order: 1;
+    height: clamp(165px, 44vw, 240px);
+    border-radius: 18px;
+  }
+  .nav {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding-top: 16px;
+  }
+  .nav a {
+    display: flex;
+    align-items: stretch;
+    min-height: 58px;
+    aspect-ratio: auto;
+    background: var(--site-surface);
+    color: var(--site-text);
+    border: 1px solid var(--site-border);
+    border-radius: 12px;
+  }
+  .thumb {
+    position: relative;
+    width: 88px;
+    flex: none;
+    z-index: auto;
+  }
+  .thumb::after {
+    display: none;
+  }
+  .navLabel {
+    width: 100%;
+    font-size: 1rem;
+  }
+  .navLabel svg {
+    color: var(--site-accent);
+  }
+  .split,
+  .climateGrid,
+  .climatePrices {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+  .scene {
+    aspect-ratio: auto;
+    max-height: 260px;
+  }
+  .scene img,
+  .climateScene img {
+    max-height: 260px;
+    object-fit: contain;
+  }
+  .section:first-of-type .scene {
+    order: 1;
+  }
+  .split [data-catalog-row],
+  .climatePrices [data-catalog-row] {
+    flex-direction: row;
+    align-items: center;
+  }
+  .options article {
+    column-gap: 10px;
+  }
+  .visit {
+    grid-template-columns: 68px minmax(0, 1fr);
+  }
+  .visit h2 {
+    font-size: 1.4rem;
+  }
+  .visit > a {
+    white-space: normal;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .thumb img {
+    transition: none;
+  }
+}

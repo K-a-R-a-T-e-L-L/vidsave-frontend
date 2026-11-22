@@ -13,19 +13,27 @@ import styles from './styles.module.scss';
 export function HeroBackdrop() {
   return <div className={styles.backdrop} aria-hidden="true" />;
 }
-export function HeroControls({ secondaryHref = '#system' }: { secondaryHref?: string }) {
+export function HeroControls({
+  secondaryHref = '#system',
+  primaryLabel = 'Обсудить мой объект',
+  secondaryLabel = 'Как всё устроено',
+}: {
+  secondaryHref?: string;
+  primaryLabel?: string;
+  secondaryLabel?: string;
+}) {
   return (
     <>
       <div className={styles.actions}>
         <ActionLink href="#request" rightSection={<IconArrowUpRight size={19} aria-hidden="true" />}>
-          Обсудить мой объект
+          {primaryLabel}
         </ActionLink>
         <ActionLink
           href={secondaryHref}
           variant="subtle"
           rightSection={<IconPlayerPlay size={18} aria-hidden="true" />}
         >
-          Как всё устроено
+          {secondaryLabel}
         </ActionLink>
       </div>
       <ul className={styles.benefits}>

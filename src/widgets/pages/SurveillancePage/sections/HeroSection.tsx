@@ -14,7 +14,7 @@ export default function HeroSection() {
           <br />
           видеонаблюдения
           <br />
-          <em>в Кемерово</em>
+          <em>в Кемерово и области</em>
         </h1>
         <p className={`${styles.lead} ${refresh.lead}`}>
           Видеть, что происходит.

@@ -1,43 +1,52 @@
 'use client';
-import { IconArrowRight, IconPhone, IconMail } from '@tabler/icons-react';
+import { IconBrandTelegram, IconPhone, IconMail, IconMapPin } from '@tabler/icons-react';
 import { useContactData } from '../CmsContent';
+import Link from 'next/link';
 import LeadForm from '../LeadForm';
 import styles from './styles.module.scss';
 export default function FeedbackSection() {
-  const { contactData, companyData } = useContactData();
+  const { contactData, settings } = useContactData();
   return (
     <section id="request" className={styles.section} aria-labelledby="request-title">
       <div className={styles.intro}>
-        <span className={styles.eyebrow}>Обсудим вашу задачу</span>
-        <h2 id="request-title">Начнём с вашего объекта</h2>
+        <h2 id="request-title">Обсудим ваш объект</h2>
         <p>
-          Расскажите, что нужно установить или настроить. Поможем определиться с оборудованием, составом работ и
-          следующим шагом.
+          Работаем в Кемерово и Кемеровской области. Укажите адрес и задачу — согласуем состав работ и стоимость выезда.
         </p>
-        <div className={styles.steps}>
-          <IconArrowRight size={20} aria-hidden="true" />
-          <span>Оставьте контакты — обсудим детали и подготовку к работам.</span>
-        </div>
         <div className={styles.contacts}>
           <a href={contactData.phoneHref}>
             <IconPhone size={19} />
             <span>
-              <small>Можно позвонить</small>
+              <small>Телефон</small>
               <strong>{contactData.phoneLabel}</strong>
             </span>
           </a>
-          <a href={'mailto:' + companyData.email}>
+          <a href={'mailto:' + settings.email}>
             <IconMail size={19} />
             <span>
-              <small>Или написать</small>
-              <strong>{companyData.email}</strong>
+              <small>Почта</small>
+              <strong>{settings.email}</strong>
             </span>
           </a>
+          {settings.telegram && (
+            <a href={settings.telegram} target="_blank" rel="noopener noreferrer">
+              <IconBrandTelegram size={19} aria-hidden="true" />
+              <strong>Написать в Telegram</strong>
+            </a>
+          )}
         </div>
+        {contactData.addressLabel && (
+          <div className={styles.address}>
+            <IconMapPin size={19} aria-hidden="true" />
+            <div>
+              <span>{contactData.addressLabel}</span>
+              <Link href="/contacts#karta">Посмотреть на карте</Link>
+            </div>
+          </div>
+        )}
       </div>
       <div className={styles.form}>
         <h3>Оставить заявку</h3>
-        <p>Имя и телефон — чтобы мы могли вам ответить.</p>
         <LeadForm />
       </div>
     </section>

@@ -1,9 +1,10 @@
 import { cmsPageMetadata, getCmsBootstrap } from '@/app/lib/cms';
-import Link from 'next/link';
+import { IconMail, IconPhone } from '@tabler/icons-react';
 import Contacts from '@/app/components/Contacts';
 import { PageSection, PublicPage } from '@/app/components/PublicPage';
 import { WorkJourney } from '@/app/components/Editorial';
 import { contactValues } from '@/app/lib/site-contact';
+import CityLinks from '@/app/components/CityLinks';
 import styles from '@/app/components/Editorial/styles.module.scss';
 
 export async function generateMetadata() {
@@ -46,39 +47,49 @@ export default async function Page() {
         />
       </PageSection>
       <PageSection
+        id="goroda"
         title="Выезд по Кузбассу"
-        description="Работаем в Кемерово и Кемеровской области. Обсуждаем выезды в Топки, Берёзовский, Ленинск-Кузнецкий, Юргу, Анжеро-Судженск и другие населённые пункты. Укажите свой адрес: возможность, сроки и стоимость выезда согласуем по объёму работ."
-      />
+        description="Выберите город, чтобы посмотреть работы и цены. Сроки и стоимость выезда согласуем по адресу и объёму работ."
+      >
+        <CityLinks />
+      </PageSection>
       <PageSection title="Дополнительная связь и реквизиты">
         <div className={styles.contactDetails}>
-          <div>
-            <span className={styles.eyebrow}>По организационным вопросам</span>
-            <Link className={styles.contactLink} href={contactData.additionalPhoneHref}>
-              {contactData.additionalPhone}
-            </Link>
-            <Link className={styles.contactLink} href={`mailto:${contactData.legalEmail}`}>
-              {contactData.legalEmail}
-            </Link>
+          <div className={styles.organisation}>
+            <h3>По организационным вопросам</h3>
+            {contactData.additionalPhone && (
+              <a className={styles.contactLink} href={contactData.additionalPhoneHref}>
+                <IconPhone size={19} aria-hidden="true" />
+                {contactData.additionalPhone}
+              </a>
+            )}
+            <a className={styles.contactLink} href={`mailto:${settings.email}`}>
+              <IconMail size={19} aria-hidden="true" />
+              {settings.email}
+            </a>
             <p>Перед поездкой уточните время встречи по телефону.</p>
           </div>
-          <dl className={styles.requisites}>
-            <div>
-              <dt>Наименование</dt>
-              <dd>{contactData.legalName}</dd>
-            </div>
-            <div>
-              <dt>ИНН</dt>
-              <dd>{contactData.inn}</dd>
-            </div>
-            <div>
-              <dt>ЕГРИП</dt>
-              <dd>{contactData.egrip}</dd>
-            </div>
-            <div>
-              <dt>Юридический адрес</dt>
-              <dd>{contactData.legalAddress}</dd>
-            </div>
-          </dl>
+          <div className={styles.legal}>
+            <h3>Реквизиты</h3>
+            <dl className={styles.requisites}>
+              <div>
+                <dt>Наименование</dt>
+                <dd>{contactData.legalName}</dd>
+              </div>
+              <div>
+                <dt>ИНН</dt>
+                <dd>{contactData.inn}</dd>
+              </div>
+              <div>
+                <dt>ЕГРИП</dt>
+                <dd>{contactData.egrip}</dd>
+              </div>
+              <div>
+                <dt>Юридический адрес</dt>
+                <dd>{contactData.legalAddress}</dd>
+              </div>
+            </dl>
+          </div>
         </div>
       </PageSection>
     </PublicPage>

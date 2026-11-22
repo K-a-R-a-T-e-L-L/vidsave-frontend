@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     service.seoTitle?.trim() || service.name + ' в Кемерово',
     service.seoDescription?.trim() || toMetaDescription(service.name + '. ' + service.description),
     '/services/' + service.slug,
+    service.imagePath ? { url: service.imagePath, alt: service.imageAlt || service.name } : undefined,
   );
 }
 export default async function Page({ params }: Props) {

@@ -1,0 +1,45 @@
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+@media (max-width: 700px) {
+  .pair {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.dropdown {
+  padding: 5px;
+  border: 1px solid var(--site-border);
+  border-radius: 12px;
+  color: var(--site-text);
+  background: var(--site-surface);
+  box-shadow: var(--site-shadow);
+}
+.option {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.option:hover,
+.option[data-combobox-selected],
+.option[aria-selected='true'] {
+  color: var(--site-accent);
+  background: var(--site-accent-soft);
+}
+.contactOption {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+}
+.contactOption span {
+  flex: 1;
+}
+.contactOption svg {
+  color: var(--site-accent);
+}

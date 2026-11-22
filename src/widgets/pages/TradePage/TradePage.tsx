@@ -1,4 +1,5 @@
 import TradeProcess from '@/app/components/TradeProcess';
+import CityLinks from '@/app/components/CityLinks';
 import { HeroBackdrop, HeroControls, PricingColumns } from '@/app/components/LandingPrimitives';
 import ClimateBenefits from './ClimateBenefits';
 import Link from 'next/link';
@@ -168,6 +169,7 @@ export default async function TradePage({ kind }: { kind: TradeKind }) {
           <div className={styles.geography}>
             <div>
               <strong>Кемерово и Кемеровская область</strong>
+              <CityLinks direction={kind === 'climate' ? 'kondicionery' : 'elektromontazh'} />
               <p>
                 Укажите населённый пункт в заявке. Возможность, сроки и стоимость выезда согласуем по адресу и объёму
                 работ.

@@ -1,5 +1,6 @@
 import refresh from '../Refresh.module.scss';
 import Link from 'next/link';
+import CityLinks from '@/app/components/CityLinks';
 import { IconArrowUpRight, IconMapPin } from '@tabler/icons-react';
 import RepairIllustration from '../RepairIllustration';
 import ProcessSignal from '../ProcessSignal.client';
@@ -57,6 +58,7 @@ export default function DeliverySection() {
         <IconMapPin size={30} stroke={1.5} aria-hidden="true" />
         <div>
           <strong>Кемерово и Кемеровская область</strong>
+          <CityLinks direction="videonablyudenie" />
           <p>
             Укажите населённый пункт в заявке. Возможность, сроки и стоимость выезда согласуем по адресу и объёму работ.
           </p>

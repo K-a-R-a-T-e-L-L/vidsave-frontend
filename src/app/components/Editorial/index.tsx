@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import CityLinks from '../CityLinks';
 import {
   IconCamera,
   IconSnowflake,
@@ -190,9 +191,10 @@ export function ServiceArea() {
         <span className={styles.eyebrow}>Кемерово · Кузбасс</span>
         <h2>Начнём с вашего адреса</h2>
         <p>
-          Кемерово, Топки, Берёзовский, Ленинск-Кузнецкий, Юрга, Анжеро-Судженск. Это не полный список: возможность,
-          сроки и стоимость выезда в другие населённые пункты обсуждаем по задаче.
+          Выберите город, чтобы посмотреть услуги и цены. Для других населённых пунктов уточним условия выезда по
+          адресу.
         </p>
+        <CityLinks />
         <Link className={styles.link} href="/contacts">
           Контакты и карта <IconArrowUpRight size={18} />
         </Link>
