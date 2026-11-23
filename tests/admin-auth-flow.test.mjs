@@ -69,7 +69,7 @@ test(
 );
 
 test('admin POST BFF rejects a foreign Origin before contacting the backend', { skip: !frontendOrigin }, async () => {
-  for (const origin of ['https://attacker.invalid', 'https://regsave.ru/admin']) {
+  for (const origin of ['https://attacker.invalid', 'https://recsave.ru/admin']) {
     const response = await fetch(`${frontendOrigin}/api/admin/admins`, {
       method: 'POST',
       headers: {
@@ -113,7 +113,7 @@ test(
       const html = await response.text();
       assert.match(html, /<html lang="ru"/i);
       if (pagePath !== '/') {
-        assert.ok(html.includes(`https://regsave.ru${pagePath}`), `${pagePath} keeps its canonical URL`);
+        assert.ok(html.includes(`https://recsave.ru${pagePath}`), `${pagePath} keeps its canonical URL`);
       }
     }
 
@@ -124,7 +124,7 @@ test(
     assert.equal(new Set(sitemapUrls).size, sitemapUrls.length, 'sitemap contains no duplicate URLs');
     for (const pagePath of [...paths, '/for-home', '/for-business', '/about', '/contacts']) {
       assert.ok(
-        sitemapUrls.includes(new URL(pagePath, 'https://regsave.ru').href),
+        sitemapUrls.includes(new URL(pagePath, 'https://recsave.ru').href),
         `${pagePath} remains in the dynamic sitemap`,
       );
     }
@@ -132,7 +132,7 @@ test(
 
     const robots = await fetch(`${frontendOrigin}/robots.txt`, { cache: 'no-store' });
     assert.equal(robots.status, 200);
-    assert.match(await robots.text(), /Sitemap:\s*https:\/\/regsave\.ru\/sitemap\.xml/i);
+    assert.match(await robots.text(), /Sitemap:\s*https:\/\/recsave\.ru\/sitemap\.xml/i);
 
     const feed = await fetch(`${frontendOrigin}/feed/services`, { cache: 'no-store' });
     assert.equal(feed.status, 200);

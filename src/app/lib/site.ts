@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const siteConfig = {
-  url: 'https://regsave.ru',
+  url: 'https://recsave.ru',
   name: 'ВИДЕОХРАНИТЕЛЬ',
   description:
     'Монтаж систем видеонаблюдения, установка и обслуживание кондиционеров, электромонтажные работы в Кемерово и Кемеровской области.',
