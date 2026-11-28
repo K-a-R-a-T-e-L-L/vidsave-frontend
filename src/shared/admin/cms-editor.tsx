@@ -420,6 +420,11 @@ export function CmsEditor({ resource, id }: { resource: Resource; id?: string })
                   <Textarea
                     key={field.name}
                     {...common}
+                    description={
+                      resource === 'projects' && ['task', 'solution', 'result'].includes(field.name)
+                        ? 'Отделяйте абзацы пустой строкой. Ссылка на услугу, статью или кейс: [текст ссылки](/blog/адрес-статьи).'
+                        : undefined
+                    }
                     value={value}
                     autosize
                     minRows={3}

@@ -1,0 +1,90 @@
+.story {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(0, 2.5fr);
+  align-items: start;
+  gap: clamp(24px, 5vw, 80px);
+  margin-block: clamp(24px, 4vw, 56px);
+}
+.summary,
+.material {
+  border: 1px solid var(--site-border);
+  border-radius: var(--site-radius);
+  background: var(--site-surface);
+  padding: clamp(18px, 2.5vw, 30px);
+}
+.summary h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+.summary p,
+.narrative p,
+.caption {
+  color: var(--site-muted);
+  line-height: 1.65;
+}
+.summary a {
+  display: block;
+  margin-top: 12px;
+}
+.summary a,
+.narrative a,
+.categories a,
+.material strong {
+  color: var(--site-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.narrative section + section {
+  border-top: 1px solid var(--site-border);
+  padding-top: 24px;
+  margin-top: 24px;
+}
+.narrative h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 2.5vw, 2rem);
+}
+.narrative p {
+  max-width: 72ch;
+  margin: 12px 0 0;
+}
+.figure {
+  min-width: 0;
+  margin: 0;
+}
+.caption {
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-block: 20px;
+}
+.materials {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 16px;
+}
+.material {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 10px;
+}
+.material strong {
+  font-size: 1.12rem;
+}
+.material span {
+  color: var(--site-muted);
+  line-height: 1.55;
+}
+.material:hover,
+.material:focus-visible {
+  border-color: var(--site-accent);
+}
+@media (max-width: 700px) {
+  .story {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,6 +1,7 @@
 import { siteMetadata } from '@/app/lib/cms';
 import Image from '@/app/components/MediaImage';
 import Link from 'next/link';
+import styles from '@/app/components/editorial-detail.module.scss';
 import { getContentDetail, getContentList } from '@/app/lib/cms';
 import { PublicPage, PageSection } from '@/app/components/PublicPage';
 import { RichContent } from '@/app/components/RichContent';
@@ -34,7 +35,14 @@ export async function generateMetadata({ params }: Props) {
 export default async function Page({ params }: Props) {
   const { slug } = await params;
   const item = await getContentDetail('posts', slug);
-  const related = await getContentList('posts', 'limit=4');
+  const groups = await Promise.all(
+    (item.categories || []).map((category) =>
+      getContentList('posts', new URLSearchParams({ category: category.slug, limit: '4' }).toString()),
+    ),
+  );
+  const related = [...new Map(groups.flatMap((group) => group.items).map((post) => [post.id, post])).values()]
+    .filter((post) => post.id !== item.id)
+    .slice(0, 3);
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -54,15 +62,20 @@ export default async function Page({ params }: Props) {
     <PublicPage
       article
       afterContent={
-        <PageSection title="Другие материалы">
-          {related.items
-            .filter((post) => post.id !== item.id)
-            .map((post) => (
-              <p key={post.id}>
-                <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-              </p>
-            ))}
-        </PageSection>
+        related.length > 0 && (
+          <PageSection title="Другие материалы">
+            <div className={styles.materials}>
+              {related.map((post) => (
+                <Link key={post.id} href={`/blog/${post.slug}`} className={styles.material}>
+                  <strong>
+                    {post.title} <span aria-hidden="true">→</span>
+                  </strong>
+                  {post.excerpt && <span>{post.excerpt}</span>}
+                </Link>
+              ))}
+            </div>
+          </PageSection>
+        )
       }
       title={item.title}
       description={item.excerpt}
@@ -95,10 +108,10 @@ export default async function Page({ params }: Props) {
         </p>
       )}
       {item.body && <RichContent document={item.body} />}
-      <nav aria-label="Категории статьи">
+      <nav aria-label="Категории статьи" className={styles.categories}>
         {item.categories?.map((category) => (
           <Link key={category.id} href={`/blog/category/${category.slug}`}>
-            {category.title} ·{' '}
+            {category.title}
           </Link>
         ))}
       </nav>

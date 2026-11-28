@@ -1,4 +1,6 @@
 import JsonLd from '@/app/components/JsonLd';
+import { ProjectStory } from '@/app/components/ProjectStory';
+import styles from '@/app/components/editorial-detail.module.scss';
 import { siteConfig } from '@/app/lib/site';
 import { siteMetadata } from '@/app/lib/cms';
 import Image from '@/app/components/MediaImage';
@@ -69,30 +71,32 @@ export default async function Page({ params }: Props) {
           className="editorial-cover"
         />
       )}
-      <PageSection title="Объект" description={item.objectType} />
-      <PageSection title="Задача" description={item.task} />
-      <PageSection title="Выполненное решение" description={item.solution} />
-      <PageSection title="Результат" description={item.result} />
+      <ProjectStory item={item} />
       {!!item.galleryIds?.length && (
-        <PageSection title="Галерея проекта">
+        <PageSection id="photos" title="Галерея проекта">
           <div className="project-gallery">
-            {item.galleryIds.map((id, index) => (
-              <Image
-                key={id}
-                src={`/media/${id}`}
-                alt={item.gallery?.find((image) => image.id === id)?.alt || `${item.title} — фотография ${index + 1}`}
-                width={600}
-                sizes="(max-width: 760px) 90vw, 50vw"
-                height={400}
-                className="project-gallery-photo"
-              />
-            ))}
+            {item.galleryIds.map((id, index) => {
+              const caption = item.gallery?.find((image) => image.id === id)?.alt;
+              return (
+                <figure key={id} className={styles.figure}>
+                  <Image
+                    src={`/media/${id}`}
+                    alt={caption || `${item.title} — фотография ${index + 1}`}
+                    width={600}
+                    sizes="(max-width: 760px) 90vw, 50vw"
+                    height={400}
+                    className="project-gallery-photo"
+                  />
+                  {caption && <figcaption className={styles.caption}>{caption}</figcaption>}
+                </figure>
+              );
+            })}
           </div>
         </PageSection>
       )}
       {!!item.services?.length && (
-        <PageSection title="Услуги проекта">
-          <ServicePreview services={item.services} />
+        <PageSection id="project-services" title="Услуги проекта">
+          <ServicePreview services={item.services} compact />
         </PageSection>
       )}
     </PublicPage>
