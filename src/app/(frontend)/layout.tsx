@@ -71,7 +71,15 @@ export default async function RootLayout({
         <ColorSchemeScript defaultColorScheme="light" localStorageKey="vidsave_theme" />
         <HeroPreload />
       </head>
-      <body>
+      <body
+        style={
+          {
+            '--editorial-cover': (data.settings.coverHeight ?? 420) + 'px',
+            '--mobile-editorial-cover': (data.settings.mobileCoverHeight ?? 240) + 'px',
+            '--project-photo-ratio': data.settings.galleryRatio ?? '4/3',
+          } as React.CSSProperties
+        }
+      >
         <ThemeProvider>
           <CmsProvider data={{ ...data, settings: publicSettings }}>
             <PublicInteractions />

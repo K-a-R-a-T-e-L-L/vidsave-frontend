@@ -58,6 +58,9 @@ export type Settings = Record<
   | 'policyVersion',
   string
 > & {
+  coverHeight?: number;
+  mobileCoverHeight?: number;
+  galleryRatio?: string;
   latitude: number;
   longitude: number;
   privacyBody: RichNode;

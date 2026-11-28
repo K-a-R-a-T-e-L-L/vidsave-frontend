@@ -10,8 +10,7 @@ import JsonLd from '@/app/components/JsonLd';
 import { Breadcrumbs } from '@/app/components/PublicPage';
 import { absoluteUrl } from '@/app/lib/site';
 import { getPublishedServices } from '@/app/lib/catalog';
-import { catalogServicePrice } from '@/app/lib/catalog-format';
-import { directionCategorySlugs } from '@/app/lib/public-content';
+import { catalogServicePrice, servicesForDirection } from '@/app/lib/catalog-format';
 import ActionLink from '../SurveillancePage/ActionLink.client';
 import SystemDiagram from './SystemDiagram';
 import { tradeContent, type TradeKind } from './trade.data';
@@ -20,8 +19,7 @@ import type { CSSProperties } from 'react';
 
 export default async function TradePage({ kind }: { kind: TradeKind }) {
   const data = tradeContent[kind];
-  const category = directionCategorySlugs[kind === 'climate' ? 1 : 2];
-  const services = (await getPublishedServices()).filter((item) => item.category.slug === category);
+  const services = servicesForDirection(await getPublishedServices(), kind);
   const photoStyle = {
     '--trade-photo-light': `url('/images/home-v2/${data.lightMedia}.webp')`,
     '--trade-photo-dark': `url('/images/home-v2/${data.media}.webp')`,

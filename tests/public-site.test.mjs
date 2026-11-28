@@ -55,6 +55,9 @@ const contactKeys = [
   'address',
   'geography',
   'hours',
+  'coverHeight',
+  'mobileCoverHeight',
+  'galleryRatio',
   'latitude',
   'longitude',
   'telegram',
@@ -535,6 +538,29 @@ test('RSS includes published posts and escapes titles', async () => {
   }
 });
 
+test('published service tariffs drive the visible table and structured offers', async () => {
+  const record = records.find((service) => service.slug === 'ustanovka-ip-kamer');
+  const previous = record.tariffs;
+  try {
+    record.tariffs = [
+      { label: 'Первый вариант', priceRub: '1234.50' },
+      { label: 'Второй вариант', priceRub: '2000' },
+    ];
+    const html = await page('/services/' + record.slug);
+    assert.ok(html.includes('<dt>Первый вариант</dt>'));
+    assert.ok(html.includes('<dt>Второй вариант</dt>'));
+    const schema = [...html.matchAll(/<script[^>]*type="application\/ld\+json"[^>]*>(.*?)<\/script>/gs)]
+      .map((match) => JSON.parse(match[1]))
+      .find((item) => item['@type'] === 'Service');
+    assert.deepEqual(
+      schema.offers.map(({ name, price }) => [name, price]),
+      record.tariffs.map(({ label, priceRub }) => [label, priceRub]),
+    );
+  } finally {
+    record.tariffs = previous;
+  }
+});
+
 test('city landings resolve published prices and order options on all ten canonical URLs', async () => {
   const cityUrls = [
     ...(await page('/sitemap.xml')).matchAll(/<loc>(https:\/\/recsave\.ru\/goroda\/[^<]+)<\/loc>/g),
@@ -653,6 +679,9 @@ test(
       assert.equal(savedContacts.status(), 200, 'Contact save HTTP status');
       await page.getByText('Изменения сохранены', { exact: true }).waitFor();
       assert.equal(adminContacts.phone, '8-900-777-66-55');
+      assert.equal(adminContacts.coverHeight, 420);
+      assert.equal(adminContacts.mobileCoverHeight, 240);
+      assert.equal(adminContacts.galleryRatio, '4/3');
       await page.goto(origin + '/contacts', { waitUntil: 'networkidle' });
       assert.ok(await page.locator('a[href="tel:+79007776655"]').count());
       await page.setViewportSize({ width: 375, height: 200 });

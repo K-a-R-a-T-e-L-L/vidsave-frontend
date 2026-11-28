@@ -1,4 +1,5 @@
 import type { CatalogService } from '@/app/lib/catalog-types';
+import { servicesForDirection } from '@/app/lib/catalog-format';
 
 export const surveillanceContent = {
   path: '/videonablyudenie',
@@ -9,9 +10,7 @@ export const surveillanceContent = {
 
 // Match published catalog records only. Never substitute legacy snapshot prices.
 export function selectSurveillanceServices(services: CatalogService[]) {
-  return services.filter((service) =>
-    ['ustanovka-i-nastroika-sistem-videonablyudeniya', 'ustanovka-videoregistratorov'].includes(service.category.slug),
-  );
+  return servicesForDirection(services, 'surveillance');
 }
 
 export const surveillanceFaq = [

@@ -27,6 +27,7 @@ import { MediaPicker } from './media-picker';
 import { RichEditor } from './rich-editor';
 import { RichContent } from '@/app/components/RichContent';
 import type { RichNode } from '@/app/lib/cms-types';
+import type { ServiceTariff } from '@/app/lib/catalog-types';
 
 export type Resource =
   | 'services'
@@ -271,6 +272,13 @@ export function CmsEditor({ resource, id }: { resource: Resource; id?: string })
   if (['posts', 'projects', 'services'].includes(resource))
     fields = [...fields, { name: 'homeOrder', label: 'Позиция на главной', kind: 'number' }];
   if (resource === 'blog-categories') fields = [...fields, { name: 'sortOrder', label: 'Порядок', kind: 'number' }];
+  const tariffs = (form.tariffs ?? []) as ServiceTariff[];
+  function replaceTariff(index: number, changes: Partial<ServiceTariff>) {
+    set(
+      'tariffs',
+      tariffs.map((row, i) => (i === index ? { ...row, ...changes } : row)),
+    );
+  }
   function payload(): FormData {
     const names = fields.map((field) => field.name);
     if (['services', 'service-categories', 'posts', 'projects', 'blog-categories'].includes(resource))
@@ -290,6 +298,20 @@ export function CmsEditor({ resource, id }: { resource: Resource; id?: string })
       if (name in result && resource !== 'settings') result[name] = result[name] || null;
     if ('homeOrder' in result) result.homeOrder = form.homeOrder || null;
     if (resource === 'services' && result.priceMode === 'on_request') result.priceRub = null;
+    if (resource === 'services') {
+      result.tariffs = tariffs;
+      if (tariffs.length) {
+        const prices = tariffs.map((row) => Number(row.priceRub));
+        result.priceRub = String(Math.min(...prices));
+        result.priceMode = new Set(prices).size === 1 ? 'fixed' : 'from';
+      }
+    }
+    if (resource === 'service-categories') result.direction = form.direction || null;
+    if (resource === 'settings') {
+      result.coverHeight = form.coverHeight ?? 420;
+      result.mobileCoverHeight = form.mobileCoverHeight ?? 240;
+      result.galleryRatio = form.galleryRatio ?? '4/3';
+    }
     if ('slug' in result && !result.slug)
       result.slug = contentSlug(String(form.title || form.name || ''), crypto.randomUUID());
     return result;
@@ -382,80 +404,182 @@ export function CmsEditor({ resource, id }: { resource: Resource; id?: string })
             </>
           )}
           <SimpleGrid cols={{ base: 1, sm: 2 }}>
-            {fields.map((field) => {
-              const common = {
-                label: field.label,
-                required: field.required,
-                disabled: saving || (field.name === 'priceRub' && form.priceMode === 'on_request'),
-              };
-              const value = String(form[field.name] ?? '');
-              return field.kind === 'area' ? (
-                <Textarea
-                  key={field.name}
-                  {...common}
-                  value={value}
-                  autosize
-                  minRows={3}
-                  maxRows={10}
-                  onChange={(e) => set(field.name, e.currentTarget.value)}
-                />
-              ) : field.kind === 'number' ? (
-                <NumberInput
-                  key={field.name}
-                  {...common}
-                  min={field.name === 'homeOrder' ? 1 : 0}
-                  max={['homeOrder', 'sortOrder'].includes(field.name) ? 100000 : undefined}
-                  allowDecimal={!['homeOrder', 'sortOrder'].includes(field.name)}
-                  description={
-                    field.name === 'homeOrder'
-                      ? '1 — первая карточка. Пусто — автоматический выбор после закреплённых.'
-                      : field.name === 'sortOrder'
-                        ? 'Меньшее число показывается выше.'
-                        : undefined
-                  }
-                  value={
-                    field.name === 'homeOrder'
-                      ? ((form.homeOrder as number | null) ?? '')
-                      : Number(form[field.name] ?? 0)
-                  }
-                  onChange={(v) => set(field.name, field.name === 'homeOrder' && v === '' ? null : Number(v))}
-                />
-              ) : field.kind === 'select' ? (
-                <Select
-                  key={field.name}
-                  {...common}
-                  data={field.choices}
-                  value={value}
-                  onChange={(v) => set(field.name, v)}
-                />
-              ) : field.kind === 'password' ? (
-                <PasswordInput
-                  key={field.name}
-                  {...common}
-                  minLength={8}
-                  autoComplete="new-password"
-                  description="Не менее 8 символов; сервер также проверяет длину в байтах."
-                  value={value}
-                  onChange={(e) => set(field.name, e.currentTarget.value)}
-                />
-              ) : (
-                <TextInput
-                  key={field.name}
-                  {...common}
-                  value={value}
-                  type={field.name === 'email' ? 'email' : 'text'}
-                  onChange={(e) => set(field.name, e.currentTarget.value)}
-                />
-              );
-            })}
+            {fields
+              .filter(
+                (field) =>
+                  !(resource === 'services' && tariffs.length && ['priceRub', 'priceMode'].includes(field.name)),
+              )
+              .map((field) => {
+                const common = {
+                  label: field.label,
+                  required: field.required,
+                  disabled: saving || (field.name === 'priceRub' && form.priceMode === 'on_request'),
+                };
+                const value = String(form[field.name] ?? '');
+                return field.kind === 'area' ? (
+                  <Textarea
+                    key={field.name}
+                    {...common}
+                    value={value}
+                    autosize
+                    minRows={3}
+                    maxRows={10}
+                    onChange={(e) => set(field.name, e.currentTarget.value)}
+                  />
+                ) : field.kind === 'number' ? (
+                  <NumberInput
+                    key={field.name}
+                    {...common}
+                    min={field.name === 'homeOrder' ? 1 : 0}
+                    max={['homeOrder', 'sortOrder'].includes(field.name) ? 100000 : undefined}
+                    allowDecimal={!['homeOrder', 'sortOrder'].includes(field.name)}
+                    description={
+                      field.name === 'homeOrder'
+                        ? '1 — первая карточка. Пусто — автоматический выбор после закреплённых.'
+                        : field.name === 'sortOrder'
+                          ? 'Меньшее число показывается выше.'
+                          : undefined
+                    }
+                    value={
+                      field.name === 'homeOrder'
+                        ? ((form.homeOrder as number | null) ?? '')
+                        : Number(form[field.name] ?? 0)
+                    }
+                    onChange={(v) => set(field.name, field.name === 'homeOrder' && v === '' ? null : Number(v))}
+                  />
+                ) : field.kind === 'select' ? (
+                  <Select
+                    key={field.name}
+                    {...common}
+                    data={field.choices}
+                    value={value}
+                    onChange={(v) => set(field.name, v)}
+                  />
+                ) : field.kind === 'password' ? (
+                  <PasswordInput
+                    key={field.name}
+                    {...common}
+                    minLength={8}
+                    autoComplete="new-password"
+                    description="Не менее 8 символов; сервер также проверяет длину в байтах."
+                    value={value}
+                    onChange={(e) => set(field.name, e.currentTarget.value)}
+                  />
+                ) : (
+                  <TextInput
+                    key={field.name}
+                    {...common}
+                    value={value}
+                    type={field.name === 'email' ? 'email' : 'text'}
+                    onChange={(e) => set(field.name, e.currentTarget.value)}
+                  />
+                );
+              })}
           </SimpleGrid>
           {['services', 'service-categories', 'posts', 'projects', 'blog-categories'].includes(resource) && (
             <Text size="sm" c="dimmed">
               Адрес страницы создаётся автоматически и сохраняется при переименовании.
             </Text>
           )}
+          {resource === 'service-categories' && (
+            <Select
+              label="Направление прайса"
+              clearable
+              data={[
+                { value: 'surveillance', label: 'Видеонаблюдение' },
+                { value: 'climate', label: 'Кондиционеры' },
+                { value: 'electrical', label: 'Электромонтаж' },
+                { value: 'none', label: 'Только каталог' },
+              ]}
+              value={(form.direction as string) ?? null}
+              onChange={(value) => set('direction', value)}
+            />
+          )}
+          {resource === 'settings' && (
+            <Stack>
+              <Title order={2}>Изображения блога и портфолио</Title>
+              <NumberInput
+                label="Высота обложки на компьютере, px"
+                required
+                min={160}
+                max={900}
+                allowDecimal={false}
+                value={(form.coverHeight as number) ?? 420}
+                onChange={(v) => set('coverHeight', v)}
+              />
+              <NumberInput
+                label="Высота обложки на телефоне, px"
+                required
+                min={120}
+                max={500}
+                allowDecimal={false}
+                value={(form.mobileCoverHeight as number) ?? 240}
+                onChange={(v) => set('mobileCoverHeight', v)}
+              />
+              <Select
+                label="Формат миниатюр галереи"
+                allowDeselect={false}
+                data={['4/3', '3/2', '1/1', '16/9']}
+                value={String(form.galleryRatio ?? '4/3')}
+                onChange={(v) => set('galleryRatio', v)}
+              />
+            </Stack>
+          )}
           {resource === 'services' && (
             <>
+              <Title order={2}>Варианты стоимости</Title>
+              {tariffs.map((tariff, index) => (
+                <Group key={index} align="end">
+                  <TextInput
+                    label={'Условие ' + (index + 1)}
+                    required
+                    maxLength={160}
+                    value={tariff.label}
+                    onChange={(e) => replaceTariff(index, { label: e.currentTarget.value })}
+                  />
+                  <TextInput
+                    label={'Стоимость ' + (index + 1) + ', ₽'}
+                    required
+                    inputMode="decimal"
+                    pattern="[0-9]+([.][0-9]{1,2})?"
+                    value={tariff.priceRub}
+                    onChange={(e) => replaceTariff(index, { priceRub: e.currentTarget.value.replace(',', '.') })}
+                  />
+                  <Button
+                    type="button"
+                    variant="subtle"
+                    onClick={() =>
+                      set(
+                        'tariffs',
+                        tariffs.filter((_, i) => i !== index),
+                      )
+                    }
+                  >
+                    Убрать строку
+                  </Button>
+                  {index > 0 && (
+                    <Button
+                      type="button"
+                      variant="subtle"
+                      onClick={() => {
+                        const rows = [...tariffs];
+                        [rows[index - 1], rows[index]] = [rows[index], rows[index - 1]];
+                        set('tariffs', rows);
+                      }}
+                    >
+                      Выше
+                    </Button>
+                  )}
+                </Group>
+              ))}
+              <Button
+                type="button"
+                variant="light"
+                disabled={tariffs.length >= 40}
+                onClick={() => set('tariffs', [...tariffs, { label: '', priceRub: '' }])}
+              >
+                Добавить тариф
+              </Button>
               <Select
                 label="Категория"
                 required

@@ -142,9 +142,3 @@ export const audienceContent = {
     ],
   },
 } as const;
-
-export const directionCategorySlugs = [
-  'ustanovka-i-nastroika-sistem-videonablyudeniya',
-  'montazh-i-obsluzhivanie-kondicionerov',
-  'elektromontazhnye-raboty',
-] as const;

@@ -5,8 +5,10 @@ export type CatalogCategory = {
   description: string | null;
   sortOrder: number;
   legacyFeedId?: number | null;
+  direction?: 'surveillance' | 'climate' | 'electrical' | 'none' | null;
 };
 
+export type ServiceTariff = { label: string; priceRub: string };
 export type CatalogService = {
   id: string;
   legacyId: number | null;
@@ -14,7 +16,8 @@ export type CatalogService = {
   slug: string;
   description: string;
   details: string | null;
-  category: Pick<CatalogCategory, 'id' | 'name' | 'slug'>;
+  category: Pick<CatalogCategory, 'id' | 'name' | 'slug' | 'direction'>;
+  tariffs?: ServiceTariff[];
   priceRub: string | null;
   priceMode: 'fixed' | 'from' | 'on_request';
   unitLabel: string | null;

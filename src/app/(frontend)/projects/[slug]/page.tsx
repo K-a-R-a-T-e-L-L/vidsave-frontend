@@ -66,7 +66,7 @@ export default async function Page({ params }: Props) {
           width={1200}
           sizes="(max-width: 760px) 90vw, 1200px"
           height={600}
-          style={{ width: '100%', height: 'auto', borderRadius: 24, marginTop: 32 }}
+          className="editorial-cover"
         />
       )}
       <PageSection title="Объект" description={item.objectType} />
@@ -84,7 +84,7 @@ export default async function Page({ params }: Props) {
                 width={600}
                 sizes="(max-width: 760px) 90vw, 50vw"
                 height={400}
-                style={{ width: '100%', height: 'auto', borderRadius: 16 }}
+                className="project-gallery-photo"
               />
             ))}
           </div>

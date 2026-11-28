@@ -20,6 +20,7 @@ import MediaImage from '@/app/components/MediaImage';
 import { CityEnquiryLink, CityEnquiryProvider } from '@/app/components/CityEnquiry';
 import { Breadcrumbs, ServicePreview } from '@/app/components/PublicPage';
 import { getPublishedServices } from '@/app/lib/catalog';
+import { servicesForDirection } from '@/app/lib/catalog-format';
 import { getCmsBootstrap, siteMetadata } from '@/app/lib/cms';
 import { absoluteUrl } from '@/app/lib/site';
 import { cityPath, serviceCities } from '@/app/lib/service-area';
@@ -53,7 +54,8 @@ export async function generateMetadata({ params }: Props) {
 export default async function CityPage({ params }: Props) {
   const city = cityContent((await params).city);
   const [services, { settings }] = await Promise.all([getPublishedServices(), getCmsBootstrap()]);
-  const prices = (slugs: string[]) => slugs.flatMap((slug) => services.filter((item) => item.slug === slug));
+  const prices = (direction: 'surveillance' | 'climate' | 'electrical') =>
+    servicesForDirection(services, direction).slice(0, 3);
   return (
     <CityEnquiryProvider key={city.slug} city={city.name}>
       <div className="public-site">
@@ -124,14 +126,7 @@ export default async function CityPage({ params }: Props) {
                   хотите видеть и есть ли на объекте кабель или регистратор.
                 </p>
                 <h3>Цены на монтаж и настройку</h3>
-                <ServicePreview
-                  compact
-                  services={prices([
-                    'ustanovka-ip-kamer',
-                    'ustanovka-ahd-kamer',
-                    'ustanovka-nvr-(ip)-videoregistratora',
-                  ])}
-                />
+                <ServicePreview compact services={prices('surveillance')} />
                 <div className={styles.links}>
                   <CityEnquiryLink service="cameras" className={styles.action}>
                     Рассчитать установку камер
@@ -185,14 +180,7 @@ export default async function CityPage({ params }: Props) {
                   Все работы по кондиционерам <IconArrowUpRight size={16} />
                 </Link>
               </div>
-              <ServicePreview
-                compact
-                services={prices([
-                  'montazh-kondicionera-pod-klyuch',
-                  'montazh-kondicionera-na-gotovuyu-trassu',
-                  'prokladka-trassy-pod-kondicioner',
-                ])}
-              />
+              <ServicePreview compact services={prices('climate')} />
             </div>
           </section>
           <section className={styles.section} id="elektromontazh">
@@ -204,14 +192,7 @@ export default async function CityPage({ params }: Props) {
                   помещений, количество розеток и перечень оборудования.
                 </p>
                 <h3>Расценки на электромонтаж</h3>
-                <ServicePreview
-                  compact
-                  services={prices([
-                    'elektromontazh-v-1-komnatnoj-kvartire-(chastnom-dome)',
-                    'sborka-elektroboksa',
-                    'prokladka-kabelya-v-gofre',
-                  ])}
-                />
+                <ServicePreview compact services={prices('electrical')} />
                 <div className={styles.links}>
                   <CityEnquiryLink service="electrical" className={styles.action}>
                     Запросить смету на электромонтаж

@@ -37,25 +37,41 @@ export default async function Page({ params }: Props) {
     url: absoluteUrl('/services/' + service.slug),
     areaServed: settings.geography,
     provider: { '@id': siteConfig.url + '/#business' },
-    ...(service.priceMode !== 'on_request' && service.priceRub !== null
+    ...(service.tariffs?.length
       ? {
-          offers: {
+          offers: service.tariffs.map((row) => ({
             '@type': 'Offer',
+            name: row.label,
             url: absoluteUrl('/services/' + service.slug),
-            ...(service.priceMode === 'fixed'
-              ? { price: service.priceRub, priceCurrency: 'RUB' }
-              : {
-                  priceSpecification: {
-                    '@type': 'UnitPriceSpecification',
-                    minPrice: service.priceRub,
-                    priceCurrency: 'RUB',
-                    unitText: service.unitLabel || undefined,
-                  },
-                }),
-            ...(service.unitLabel ? { description: service.unitLabel } : {}),
-          },
+            priceCurrency: 'RUB',
+            price: row.priceRub,
+            priceSpecification: {
+              '@type': 'UnitPriceSpecification',
+              price: row.priceRub,
+              priceCurrency: 'RUB',
+              unitText: service.unitLabel || undefined,
+            },
+          })),
         }
-      : {}),
+      : service.priceMode !== 'on_request' && service.priceRub !== null
+        ? {
+            offers: {
+              '@type': 'Offer',
+              url: absoluteUrl('/services/' + service.slug),
+              ...(service.priceMode === 'fixed'
+                ? { price: service.priceRub, priceCurrency: 'RUB' }
+                : {
+                    priceSpecification: {
+                      '@type': 'UnitPriceSpecification',
+                      minPrice: service.priceRub,
+                      priceCurrency: 'RUB',
+                      unitText: service.unitLabel || undefined,
+                    },
+                  }),
+              ...(service.unitLabel ? { description: service.unitLabel } : {}),
+            },
+          }
+        : {}),
   };
   const related = services
     .filter((item) => item.id !== service.id && item.category.id === service.category.id)
@@ -88,6 +104,25 @@ export default async function Page({ params }: Props) {
         )}
         <div className={styles.detailCopy}>
           <strong className={styles.price}>{catalogServicePrice(service)}</strong>
+          {!!service.tariffs?.length && (
+            <section aria-label="Тарифы">
+              <h2>Стоимость работ</h2>
+              <dl className="service-tariffs">
+                {service.tariffs.map((row, index) => (
+                  <div key={index}>
+                    <dt>{row.label}</dt>
+                    <dd>
+                      {catalogServicePrice({
+                        priceMode: 'fixed',
+                        priceRub: row.priceRub,
+                        unitLabel: service.unitLabel,
+                      })}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
           <h2>Описание услуги</h2>
           <p>{service.description}</p>
           {service.details?.trim() && (
