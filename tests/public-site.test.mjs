@@ -1,6 +1,7 @@
 import sharp from 'sharp';
 import assert from 'node:assert/strict';
-import { cp, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { promisify } from 'node:util';
 import http from 'node:http';
 import path from 'node:path';
 import os from 'node:os';
@@ -40,7 +41,7 @@ const mediaBytes = await sharp('public/images/design-preview/hero-light.webp')
 const publicContent = { posts: [], projects: [], 'blog-categories': [] };
 let mediaPublished = true;
 let unavailable = false;
-let frontend, backend, temp, origin;
+let frontend, backend, origin;
 const testProfile = { id: 'fixture-admin', email: 'simplify@example.test', role: 'ADMIN' };
 const testAccess = [
   'e30',
@@ -254,42 +255,24 @@ test.before(async () => {
   const reservation = http.createServer();
   const frontendPort = await listen(reservation);
   await new Promise((resolve) => reservation.close(resolve));
-  // Webpack cannot resolve a linked Next package across Windows drive letters.
-  // Keep the small temporary app on the same drive; never copy node_modules.
-  temp = await mkdtemp(path.join(process.platform === 'win32' ? process.cwd() : os.tmpdir(), '.vidsave-stage41-test-'));
-  for (const item of ['src', 'public', 'package.json', 'tsconfig.json', 'next.config.ts', 'postcss.config.cjs']) {
-    await cp(item, path.join(temp, item), { recursive: true });
+  const appDirectory = process.env.VIDSAVE_PREBUILT_FRONTEND || process.cwd();
+  const next = path.join(process.cwd(), 'node_modules/next/dist/bin/next');
+  const fixtureEnv = {
+    ...process.env,
+    NODE_ENV: 'production',
+    FRONTEND_ORIGIN: `http://localhost:${frontendPort}`,
+    BACKEND_INTERNAL_URL: `http://127.0.0.1:${backendPort}`,
+    NEXT_TELEMETRY_DISABLED: '1',
+  };
+  // Font preload and CSS assertions exercise the production bundle. CI already built it.
+  if (!process.env.VIDSAVE_PREBUILT_FRONTEND) {
+    await promisify(execFile)(process.execPath, [next, 'build'], { cwd: appDirectory, env: fixtureEnv });
   }
-  await symlink(
-    path.join(process.cwd(), 'node_modules'),
-    path.join(temp, 'node_modules'),
-    process.platform === 'win32' ? 'junction' : 'dir',
-  );
-  // Avoid loading the user's .env; the temporary application has only the fixture URL.
-  await writeFile(path.join(temp, '.env.local'), '', 'utf8');
-  const appDirectory = process.env.VIDSAVE_PREBUILT_FRONTEND || temp;
-  frontend = spawn(
-    process.execPath,
-    [
-      path.join(process.cwd(), 'node_modules/next/dist/bin/next'),
-      ...(process.env.VIDSAVE_PREBUILT_FRONTEND ? ['start'] : ['dev', '--webpack']),
-      '--hostname',
-      '127.0.0.1',
-      '--port',
-      String(frontendPort),
-    ],
-    {
-      cwd: appDirectory,
-      env: {
-        ...process.env,
-        NODE_ENV: process.env.VIDSAVE_PREBUILT_FRONTEND ? 'production' : 'development',
-        FRONTEND_ORIGIN: `http://localhost:${frontendPort}`,
-        BACKEND_INTERNAL_URL: `http://127.0.0.1:${backendPort}`,
-        NEXT_TELEMETRY_DISABLED: '1',
-      },
-      stdio: ['ignore', 'pipe', 'pipe'],
-    },
-  );
+  frontend = spawn(process.execPath, [next, 'start', '--hostname', '127.0.0.1', '--port', String(frontendPort)], {
+    cwd: appDirectory,
+    env: fixtureEnv,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
   mainFixturePids.push(frontend.pid);
   frontend.stdout.on('data', (data) => {
     runtimeOutput += data;
@@ -326,7 +309,7 @@ test.after(async () => {
     }
   }
   if (backend) await new Promise((resolve) => backend.close(resolve));
-  if (temp) await rm(temp, { recursive: true, force: true, maxRetries: 10, retryDelay: 500 });
+
   console.log(`Fixture cleaned up; owned Next PIDs: ${mainFixturePids.join(', ')}`);
 });
 
